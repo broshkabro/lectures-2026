@@ -1,0 +1,1427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Introduction to JavaScript</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --card: #1a1a26;
+    --border: #2a2a3d;
+    --accent: #f7c948;
+    --accent2: #5b8dee;
+    --accent3: #e05c5c;
+    --accent4: #4ecf8a;
+    --text: #e8e8f0;
+    --muted: #7a7a9a;
+    --code-bg: #0d0d15;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* GRID BACKGROUND */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(91,141,238,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(91,141,238,0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* HEADER */
+  header {
+    position: relative;
+    z-index: 10;
+    padding: 60px 40px 40px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .lecture-tag {
+    display: inline-block;
+    background: var(--accent);
+    color: #000;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+
+  h1 {
+    font-size: clamp(42px, 6vw, 80px);
+    font-weight: 800;
+    line-height: 1.0;
+    letter-spacing: -2px;
+    margin-bottom: 16px;
+  }
+
+  h1 span.highlight {
+    color: var(--accent);
+    position: relative;
+    display: inline-block;
+  }
+
+  .subtitle {
+    font-family: 'Space Mono', monospace;
+    color: var(--muted);
+    font-size: 14px;
+    margin-bottom: 40px;
+  }
+
+  .progress-bar-wrap {
+    height: 3px;
+    background: var(--border);
+    border-radius: 2px;
+    margin-top: 30px;
+    position: relative;
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 2px;
+    transition: width 0.4s ease;
+    width: 0%;
+  }
+
+  .progress-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 8px;
+    letter-spacing: 1px;
+  }
+
+  /* NAV */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(10,10,15,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 40px;
+    overflow-x: auto;
+  }
+
+  nav ul {
+    list-style: none;
+    display: flex;
+    gap: 0;
+    max-width: 1100px;
+    margin: 0 auto;
+    white-space: nowrap;
+  }
+
+  nav ul li a {
+    display: block;
+    padding: 16px 18px;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-decoration: none;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+  }
+
+  nav ul li a:hover,
+  nav ul li a.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+
+  /* MAIN */
+  main {
+    position: relative;
+    z-index: 10;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 60px 40px 100px;
+  }
+
+  /* SECTIONS */
+  .section {
+    margin-bottom: 80px;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+
+  .section.visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+
+  .section-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    background: rgba(247,201,72,0.12);
+    border: 1px solid rgba(247,201,72,0.3);
+    padding: 4px 10px;
+    letter-spacing: 2px;
+  }
+
+  .section-title {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+  }
+
+  /* PROSE */
+  .prose {
+    font-size: 16px;
+    line-height: 1.8;
+    color: #b8b8d0;
+    margin-bottom: 24px;
+  }
+
+  .prose strong {
+    color: var(--text);
+    font-weight: 700;
+  }
+
+  /* CODE BLOCK */
+  .code-block {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent2);
+    border-radius: 4px;
+    margin: 24px 0;
+    overflow: hidden;
+  }
+
+  .code-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    background: rgba(91,141,238,0.08);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .code-lang {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent2);
+  }
+
+  .run-btn {
+    background: var(--accent);
+    color: #000;
+    border: none;
+    padding: 4px 14px;
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+
+  .run-btn:hover { opacity: 0.8; }
+
+  pre {
+    padding: 20px;
+    overflow-x: auto;
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    line-height: 1.7;
+  }
+
+  .kw { color: #c792ea; }
+  .str { color: #c3e88d; }
+  .num { color: #f78c6c; }
+  .fn { color: #82aaff; }
+  .cmt { color: #546e7a; font-style: italic; }
+  .op { color: var(--accent); }
+  .bool { color: #ff5370; }
+
+  /* OUTPUT BOX */
+  .output-box {
+    background: #060610;
+    border: 1px solid var(--border);
+    border-top: none;
+    padding: 14px 20px;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    color: var(--accent4);
+    display: none;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .output-box.show { display: block; }
+  .output-label { color: var(--muted); font-size: 10px; letter-spacing: 2px; margin-bottom: 6px; }
+
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  /* CALLOUT BOXES */
+  .callout {
+    display: flex;
+    gap: 16px;
+    padding: 20px 24px;
+    border-radius: 4px;
+    margin: 24px 0;
+  }
+
+  .callout.info {
+    background: rgba(91,141,238,0.08);
+    border-left: 3px solid var(--accent2);
+  }
+
+  .callout.warning {
+    background: rgba(247,201,72,0.07);
+    border-left: 3px solid var(--accent);
+  }
+
+  .callout.tip {
+    background: rgba(78,207,138,0.07);
+    border-left: 3px solid var(--accent4);
+  }
+
+  .callout-icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+  .callout-body { font-size: 14px; line-height: 1.7; color: #b8b8d0; }
+  .callout-body strong { color: var(--text); }
+
+  /* CARDS GRID */
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+    margin: 24px 0;
+  }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 24px;
+    transition: border-color 0.2s, transform 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent2), var(--accent));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
+  }
+
+  .card:hover { border-color: var(--accent2); transform: translateY(-2px); }
+  .card:hover::after { transform: scaleX(1); }
+
+  .card-icon { font-size: 28px; margin-bottom: 12px; }
+  .card-title { font-size: 15px; font-weight: 700; margin-bottom: 8px; color: var(--text); }
+  .card-desc { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+  /* TYPE TABLE */
+  .type-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    margin: 24px 0;
+  }
+
+  .type-table th {
+    background: var(--card);
+    padding: 12px 16px;
+    text-align: left;
+    color: var(--accent);
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    border-bottom: 2px solid var(--border);
+  }
+
+  .type-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+    color: #b8b8d0;
+  }
+
+  .type-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+  .tag {
+    display: inline-block;
+    padding: 2px 8px;
+    font-size: 10px;
+    font-family: 'Space Mono', monospace;
+    border-radius: 2px;
+    font-weight: 700;
+    letter-spacing: 1px;
+  }
+
+  .tag.yellow { background: rgba(247,201,72,0.15); color: var(--accent); }
+  .tag.blue { background: rgba(91,141,238,0.15); color: var(--accent2); }
+  .tag.red { background: rgba(224,92,92,0.15); color: var(--accent3); }
+  .tag.green { background: rgba(78,207,138,0.15); color: var(--accent4); }
+
+  /* QUIZ */
+  .quiz {
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 28px;
+    margin: 32px 0;
+    position: relative;
+  }
+
+  .quiz::before {
+    content: 'QUIZ';
+    position: absolute;
+    top: -1px; right: 24px;
+    background: var(--accent3);
+    color: #fff;
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    padding: 3px 10px;
+  }
+
+  .quiz-q { font-size: 16px; font-weight: 700; margin-bottom: 18px; }
+
+  .quiz-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .quiz-opt {
+    padding: 12px 18px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    cursor: pointer;
+    text-align: left;
+    color: var(--text);
+    transition: border-color 0.2s, background 0.2s;
+  }
+
+  .quiz-opt:hover { border-color: var(--accent2); background: rgba(91,141,238,0.07); }
+  .quiz-opt.correct { border-color: var(--accent4); background: rgba(78,207,138,0.1); color: var(--accent4); }
+  .quiz-opt.wrong { border-color: var(--accent3); background: rgba(224,92,92,0.1); color: var(--accent3); }
+
+  .quiz-feedback {
+    margin-top: 14px;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    display: none;
+    padding: 10px 14px;
+  }
+
+  .quiz-feedback.show { display: block; }
+  .quiz-feedback.ok { background: rgba(78,207,138,0.08); color: var(--accent4); border-left: 2px solid var(--accent4); }
+  .quiz-feedback.ko { background: rgba(224,92,92,0.08); color: var(--accent3); border-left: 2px solid var(--accent3); }
+
+  /* INTERACTIVE PLAYGROUND */
+  .playground {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--accent4);
+    margin: 32px 0;
+    overflow: hidden;
+  }
+
+  .playground-header {
+    padding: 12px 20px;
+    background: rgba(78,207,138,0.06);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .playground-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent4);
+  }
+
+  .playground textarea {
+    width: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    padding: 20px;
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--text);
+    resize: vertical;
+    min-height: 120px;
+  }
+
+  .playground-run {
+    background: var(--accent4);
+    color: #000;
+    border: none;
+    padding: 8px 20px;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+
+  .playground-run:hover { opacity: 0.8; }
+
+  .playground-output {
+    border-top: 1px solid var(--border);
+    padding: 14px 20px;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    min-height: 44px;
+    color: var(--accent4);
+    white-space: pre-wrap;
+  }
+
+  .playground-output .err { color: var(--accent3); }
+
+  /* DIVIDER */
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, var(--border), transparent);
+    margin: 60px 0;
+  }
+
+  /* SUMMARY */
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    margin: 24px 0;
+  }
+
+  .summary-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 16px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    font-size: 14px;
+  }
+
+  .summary-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 40px;
+    text-align: center;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    position: relative;
+    z-index: 10;
+  }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+
+  /* INLINE CODE */
+  code {
+    font-family: 'Space Mono', monospace;
+    background: rgba(91,141,238,0.12);
+    color: var(--accent2);
+    padding: 1px 6px;
+    font-size: 0.88em;
+    border-radius: 2px;
+  }
+
+  @media (max-width: 600px) {
+    header, main { padding-left: 20px; padding-right: 20px; }
+    nav { padding: 0 20px; }
+    h1 { font-size: 36px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="lecture-tag">📚 Lecture Series · Lesson 01</div>
+  <h1>Introduction to<br><span class="highlight">JavaScript</span></h1>
+  <p class="subtitle">// A complete beginner's guide to the language of the web</p>
+  <div class="progress-bar-wrap">
+    <div class="progress-bar-fill" id="progressBar"></div>
+  </div>
+  <p class="progress-label" id="progressLabel">0% — scroll to track progress</p>
+</header>
+
+<nav>
+  <ul>
+    <li><a href="#what-is-js">01 · What is JS?</a></li>
+    <li><a href="#variables">02 · Variables</a></li>
+    <li><a href="#types">03 · Data Types</a></li>
+    <li><a href="#operators">04 · Operators</a></li>
+    <li><a href="#logical-operators">04b · Logical & Nullish</a></li>
+    <li><a href="#conditionals">05 · Conditionals</a></li>
+    <li><a href="#loops">06 · Loops</a></li>
+    <li><a href="#functions">07 · Functions</a></li>
+    <li><a href="#playground">08 · Playground</a></li>
+  </ul>
+</nav>
+
+<main>
+
+  <!-- SECTION 1 -->
+  <section class="section" id="what-is-js">
+    <div class="section-header">
+      <span class="section-num">01</span>
+      <h2 class="section-title">What is JavaScript?</h2>
+    </div>
+
+    <p class="prose">
+      JavaScript is the <strong>programming language of the Web</strong>. It is what makes websites interactive — from clicking buttons and submitting forms, to live chat apps and browser-based games. Alongside HTML (structure) and CSS (style), JavaScript is the third pillar of front-end development.
+    </p>
+
+    <div class="cards">
+      <div class="card">
+        <div class="card-icon">🌐</div>
+        <div class="card-title">Runs in the Browser</div>
+        <div class="card-desc">Every modern browser has a JavaScript engine built in — no installation needed to run your first script.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">⚡</div>
+        <div class="card-title">Interpreted Language</div>
+        <div class="card-desc">Code is executed line-by-line at runtime, making it fast to prototype and test without a compile step.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔄</div>
+        <div class="card-title">Dynamic & Flexible</div>
+        <div class="card-desc">Variables can hold any type of value. It supports functional, object-oriented, and event-driven paradigms.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🖥️</div>
+        <div class="card-title">Also Runs on Servers</div>
+        <div class="card-desc">With Node.js, JavaScript runs on servers too — making it a full-stack language for front and back-end.</div>
+      </div>
+    </div>
+
+    <div class="callout info">
+      <span class="callout-icon">💡</span>
+      <div class="callout-body"><strong>Quick start:</strong> Open any browser, press <code>F12</code>, go to the Console tab, and type <code>console.log("Hello, World!")</code> — you're now running JavaScript!</div>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">JavaScript</span>
+        <button class="run-btn" onclick="runCode(this, 'Hello, World!\nWelcome to JavaScript 🚀')">▶ Run</button>
+      </div>
+      <pre><span class="cmt">// Your very first JavaScript program</span>
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="str">"Hello, World!"</span>);
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="str">"Welcome to JavaScript 🚀"</span>);</pre>
+      <div class="output-box">
+        <div class="output-label">OUTPUT</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- SECTION 2 -->
+  <section class="section" id="variables">
+    <div class="section-header">
+      <span class="section-num">02</span>
+      <h2 class="section-title">Variables</h2>
+    </div>
+
+    <p class="prose">
+      A <strong>variable</strong> is a named container that stores a value. Think of it as a labelled box you can put data into and retrieve later. In modern JavaScript, you declare variables using <code>let</code>, <code>const</code>, or the older <code>var</code>.
+    </p>
+
+    <table class="type-table">
+      <thead>
+        <tr>
+          <th>Keyword</th>
+          <th>Reassignable?</th>
+          <th>Scope</th>
+          <th>Use When</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>const</code></td>
+          <td><span class="tag red">No</span></td>
+          <td><span class="tag blue">Block</span></td>
+          <td>Value won't change (preferred)</td>
+        </tr>
+        <tr>
+          <td><code>let</code></td>
+          <td><span class="tag green">Yes</span></td>
+          <td><span class="tag blue">Block</span></td>
+          <td>Value may change</td>
+        </tr>
+        <tr>
+          <td><code>var</code></td>
+          <td><span class="tag green">Yes</span></td>
+          <td><span class="tag yellow">Function</span></td>
+          <td>Legacy code (avoid in new code)</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">JavaScript</span>
+        <button class="run-btn" onclick="runCode(this, 'Alice\n25\nEngineer')">▶ Run</button>
+      </div>
+      <pre><span class="kw">const</span> name <span class="op">=</span> <span class="str">"Alice"</span>;      <span class="cmt">// string — won't change</span>
+<span class="kw">let</span> age <span class="op">=</span> <span class="num">25</span>;              <span class="cmt">// number — might change</span>
+<span class="kw">let</span> job <span class="op">=</span> <span class="str">"Developer"</span>;    <span class="cmt">// can be reassigned</span>
+
+job <span class="op">=</span> <span class="str">"Engineer"</span>;         <span class="cmt">// reassigning let is fine</span>
+
+<span class="fn">console</span>.<span class="fn">log</span>(name);
+<span class="fn">console</span>.<span class="fn">log</span>(age);
+<span class="fn">console</span>.<span class="fn">log</span>(job);</pre>
+      <div class="output-box">
+        <div class="output-label">OUTPUT</div>
+      </div>
+    </div>
+
+    <div class="callout warning">
+      <span class="callout-icon">⚠️</span>
+      <div class="callout-body"><strong>Rule of thumb:</strong> Always use <code>const</code> by default. Only switch to <code>let</code> when you know the value needs to change. Never use <code>var</code> in new code.</div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- SECTION 3 -->
+  <section class="section" id="types">
+    <div class="section-header">
+      <span class="section-num">03</span>
+      <h2 class="section-title">Data Types</h2>
+    </div>
+
+    <p class="prose">
+      Every value in JavaScript has a <strong>type</strong>. There are 7 primitive types plus the special <strong>Object</strong> type (which includes arrays and functions).
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">JavaScript</span>
+        <button class="run-btn" onclick="runCode(this, 'string\nnumber\nboolean\nundefined\nobject\nobject')">▶ Run</button>
+      </div>
+      <pre><span class="kw">const</span> greeting <span class="op">=</span> <span class="str">"Hello"</span>;        <span class="cmt">// String</span>
+<span class="kw">const</span> score     <span class="op">=</span> <span class="num">42</span>;             <span class="cmt">// Number</span>
+<span class="kw">const</span> isReady   <span class="op">=</span> <span class="bool">true</span>;           <span class="cmt">// Boolean</span>
+<span class="kw">let</span>   nothing;                     <span class="cmt">// undefined (no value assigned)</span>
+<span class="kw">const</span> empty     <span class="op">=</span> <span class="bool">null</span>;            <span class="cmt">// null (intentionally empty)</span>
+<span class="kw">const</span> colors    <span class="op">=</span> [<span class="str">"red"</span>, <span class="str">"blue"</span>]; <span class="cmt">// Array (a type of Object)</span>
+
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="kw">typeof</span> greeting);  <span class="cmt">// "string"</span>
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="kw">typeof</span> score);     <span class="cmt">// "number"</span>
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="kw">typeof</span> isReady);   <span class="cmt">// "boolean"</span>
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="kw">typeof</span> nothing);   <span class="cmt">// "undefined"</span>
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="kw">typeof</span> empty);     <span class="cmt">// "object" (historical quirk!)</span>
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="kw">typeof</span> colors);    <span class="cmt">// "object"</span></pre>
+      <div class="output-box">
+        <div class="output-label">OUTPUT</div>
+      </div>
+    </div>
+
+    <div class="callout tip">
+      <span class="callout-icon">✅</span>
+      <div class="callout-body"><strong>Template literals</strong> let you embed variables directly into strings using backticks and <code>${"{}"}</code>: <code>`Hello, ${"{name}"}!`</code> — far cleaner than string concatenation.</div>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">JavaScript — Template Literals</span>
+        <button class="run-btn" onclick="runCode(this, 'Hello, Alice! You are 25 years old.')">▶ Run</button>
+      </div>
+      <pre><span class="kw">const</span> name <span class="op">=</span> <span class="str">"Alice"</span>;
+<span class="kw">const</span> age  <span class="op">=</span> <span class="num">25</span>;
+
+<span class="cmt">// Old way (messy):</span>
+<span class="cmt">// "Hello, " + name + "! You are " + age + " years old."</span>
+
+<span class="cmt">// Modern way (clean):</span>
+<span class="kw">const</span> message <span class="op">=</span> <span class="str">`Hello, <span class="op">${</span>name<span class="op">}</span>! You are <span class="op">${</span>age<span class="op">}</span> years old.`</span>;
+<span class="fn">console</span>.<span class="fn">log</span>(message);</pre>
+      <div class="output-box">
+        <div class="output-label">OUTPUT</div>
+      </div>
+    </div>
+
+    <!-- Quiz 1 -->
+    <div class="quiz">
+      <div class="quiz-q">What will <code>typeof 42</code> return in JavaScript?</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(this, false)">"integer"</button>
+        <button class="quiz-opt" onclick="answer(this, true)">"number"</button>
+        <button class="quiz-opt" onclick="answer(this, false)">"float"</button>
+        <button class="quiz-opt" onclick="answer(this, false)">"numeric"</button>
+      </div>
+      <div class="quiz-feedback">JavaScript has only one numeric type — <strong>number</strong> — for both integers and decimals.</div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- SECTION 4 -->
+  <section class="section" id="operators">
+    <div class="section-header">
+      <span class="section-num">04</span>
+      <h2 class="section-title">Operators</h2>
+    </div>
+
+    <p class="prose">
+      Operators let you perform calculations, compare values, and combine logic. The most common categories are <strong>arithmetic</strong>, <strong>comparison</strong>, and <strong>logical</strong>.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">JavaScript — Arithmetic</span>
+        <button class="run-btn" onclick="runCode(this, '15\n5\n50\n2\n1\n100')">▶ Run</button>
+      </div>
+      <pre><span class="kw">const</span> a <span class="op">=</span> <span class="num">10</span>, b <span class="op">=</span> <span class="num">5</span>;
+
+<span class="fn">console</span>.<span class="fn">log</span>(a <span class="op">+</span> b);   <span class="cmt">// 15  — addition</span>
+<span class="fn">console</span>.<span class="fn">log</span>(a <span class="op">-</span> b);   <span class="cmt">// 5   — subtraction</span>
+<span class="fn">console</span>.<span class="fn">log</span>(a <span class="op">*</span> b);   <span class="cmt">// 50  — multiplication</span>
+<span class="fn">console</span>.<span class="fn">log</span>(a <span class="op">/</span> b);   <span class="cmt">// 2   — division</span>
+<span class="fn">console</span>.<span class="fn">log</span>(a <span class="op">%</span> b);   <span class="cmt">// 0   — modulo (remainder) → 10%5=0, 10%3=1</span>
+<span class="fn">console</span>.<span class="fn">log</span>(a <span class="op">**</span> b);  <span class="cmt">// 100000 — exponentiation (10^5)</span></pre>
+      <div class="output-box">
+        <div class="output-label">OUTPUT</div>
+      </div>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">JavaScript — Comparison & Equality</span>
+        <button class="run-btn" onclick="runCode(this, 'true\nfalse\ntrue\nfalse\ntrue\nfalse')">▶ Run</button>
+      </div>
+      <pre><span class="fn">console</span>.<span class="fn">log</span>(<span class="num">10</span> <span class="op">></span>  <span class="num">5</span>);        <span class="cmt">// true  — greater than</span>
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="num">10</span> <span class="op"><</span>  <span class="num">5</span>);        <span class="cmt">// false — less than</span>
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="num">10</span> <span class="op">>=</span> <span class="num">10</span>);       <span class="cmt">// true  — greater than or equal</span>
+
+<span class="cmt">// === checks value AND type (always prefer this)</span>
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="num">5</span>  <span class="op">===</span> <span class="num">5</span>);       <span class="cmt">// true</span>
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="num">5</span>  <span class="op">===</span> <span class="str">"5"</span>);     <span class="cmt">// false! number ≠ string</span>
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="num">5</span>  <span class="op">==</span>  <span class="str">"5"</span>);     <span class="cmt">// true  — == coerces types (avoid!)</span></pre>
+      <div class="output-box">
+        <div class="output-label">OUTPUT</div>
+      </div>
+    </div>
+
+    <div class="callout warning">
+      <span class="callout-icon">⚠️</span>
+      <div class="callout-body"><strong>Always use <code>===</code></strong> (triple equals) for comparisons. The double-equals <code>==</code> performs type coercion which leads to subtle, hard-to-find bugs.</div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- SECTION 4b -->
+  <section class="section" id="logical-operators">
+    <div class="section-header">
+      <span class="section-num">04b</span>
+      <h2 class="section-title">Logical Operators, Falsy Values & Nullish</h2>
+    </div>
+
+    <p class="prose">
+      JavaScript has powerful operators for combining conditions and handling missing values. To use them confidently, you first need to understand <strong>falsy values</strong> — the handful of values JavaScript treats as <code>false</code> in a boolean context.
+    </p>
+
+    <!-- FALSY VALUES -->
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">JavaScript — Falsy Values</span>
+        <button class="run-btn" onclick="runCode(this, '0 is falsy\nempty string is falsy\nfalse is falsy\nnull is falsy\nundefined is falsy\nNaN is falsy\n---\n42 is TRUTHY\n&quot;hello&quot; is TRUTHY\n[] is TRUTHY\n{} is TRUTHY')">▶ Run</button>
+      </div>
+      <pre><span class="cmt">// These 6 values are FALSY — everything else is truthy</span>
+<span class="kw">const</span> falsyValues <span class="op">=</span> [<span class="num">0</span>, <span class="str">""</span>, <span class="bool">false</span>, <span class="bool">null</span>, <span class="bool">undefined</span>, <span class="fn">NaN</span>];
+
+falsyValues.<span class="fn">forEach</span>(v <span class="op">=></span> {
+  <span class="fn">console</span>.<span class="fn">log</span>(<span class="str">`<span class="op">${</span>v<span class="op">}</span> is falsy`</span>);
+});
+
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="str">"---"</span>);
+
+<span class="cmt">// Truthy examples — watch out for these surprises!</span>
+<span class="kw">const</span> truthyValues <span class="op">=</span> [<span class="num">42</span>, <span class="str">"hello"</span>, [], {}];
+truthyValues.<span class="fn">forEach</span>(v <span class="op">=></span> {
+  <span class="fn">console</span>.<span class="fn">log</span>(<span class="str">`<span class="op">${</span><span class="fn">JSON</span>.<span class="fn">stringify</span>(v)<span class="op">}</span> is TRUTHY`</span>);
+});</pre>
+      <div class="output-box"><div class="output-label">OUTPUT</div></div>
+    </div>
+
+    <div class="callout warning">
+      <span class="callout-icon">⚠️</span>
+      <div class="callout-body"><strong>Common surprises:</strong> An empty array <code>[]</code> and empty object <code>{}</code> are <em>truthy</em> — only an empty string <code>""</code> and zero <code>0</code> are falsy. This trips up almost every beginner.</div>
+    </div>
+
+    <!-- && and || -->
+    <p class="prose" style="margin-top:32px;">
+      <strong><code>&&</code> (AND)</strong> and <strong><code>||</code> (OR)</strong> don't just return <code>true</code> or <code>false</code> — they return one of their actual operands. This makes them incredibly useful for short-circuit evaluation and default values.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">JavaScript — && and || Operators</span>
+        <button class="run-btn" onclick="runCode(this, '--- AND (&&) ---\nfalse\nworld\n--- OR (||) ---\nhello\nGuest\nGuest')">▶ Run</button>
+      </div>
+      <pre><span class="fn">console</span>.<span class="fn">log</span>(<span class="str">"--- AND (&&) ---"</span>);
+<span class="cmt">// && returns the FIRST falsy value, or the last value if all truthy</span>
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="bool">false</span>  <span class="op">&&</span> <span class="str">"hello"</span>);   <span class="cmt">// false  — stops at first falsy</span>
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="str">"hello"</span> <span class="op">&&</span> <span class="str">"world"</span>);   <span class="cmt">// "world" — both truthy, returns last</span>
+
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="str">"--- OR (||) ---"</span>);
+<span class="cmt">// || returns the FIRST truthy value, or the last value if all falsy</span>
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="str">"hello"</span> <span class="op">||</span> <span class="str">"world"</span>);   <span class="cmt">// "hello" — first truthy wins</span>
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="num">0</span>       <span class="op">||</span> <span class="str">"Guest"</span>);   <span class="cmt">// "Guest" — 0 is falsy, falls through</span>
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="str">""</span>      <span class="op">||</span> <span class="str">"Guest"</span>);   <span class="cmt">// "Guest" — "" is falsy, falls through</span></pre>
+      <div class="output-box"><div class="output-label">OUTPUT</div></div>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">JavaScript — Practical Short-Circuit Patterns</span>
+        <button class="run-btn" onclick="runCode(this, 'Hello, Alice!\nHello, Guest!\nUser is an admin\n(nothing logged — user not logged in)')">▶ Run</button>
+      </div>
+      <pre><span class="cmt">// || for default values (classic pattern)</span>
+<span class="kw">const</span> <span class="fn">greet</span> <span class="op">=</span> (name) <span class="op">=></span> <span class="fn">console</span>.<span class="fn">log</span>(<span class="str">`Hello, <span class="op">${</span>name <span class="op">||</span> <span class="str">"Guest"</span><span class="op">}</span>!`</span>);
+<span class="fn">greet</span>(<span class="str">"Alice"</span>);   <span class="cmt">// Hello, Alice!</span>
+<span class="fn">greet</span>(<span class="str">""</span>);        <span class="cmt">// Hello, Guest!  — empty string is falsy</span>
+
+<span class="cmt">// && for conditional execution — "do this only if that is true"</span>
+<span class="kw">const</span> user <span class="op">=</span> { name: <span class="str">"Alice"</span>, isAdmin: <span class="bool">true</span> };
+user.isAdmin <span class="op">&&</span> <span class="fn">console</span>.<span class="fn">log</span>(<span class="str">"User is an admin"</span>);
+
+<span class="kw">const</span> loggedIn <span class="op">=</span> <span class="bool">false</span>;
+loggedIn <span class="op">&&</span> <span class="fn">console</span>.<span class="fn">log</span>(<span class="str">"Dashboard loaded"</span>);
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="str">"(nothing logged — user not logged in)"</span>);</pre>
+      <div class="output-box"><div class="output-label">OUTPUT</div></div>
+    </div>
+
+    <!-- ?? nullish coalescing -->
+    <p class="prose" style="margin-top:32px;">
+      <strong><code>??</code> (Nullish Coalescing)</strong> solves a key weakness of <code>||</code>: it only falls back when the left side is <code>null</code> or <code>undefined</code> — not when it's <code>0</code> or <code>""</code>, which are legitimate values.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">JavaScript — ?? Nullish Coalescing</span>
+        <button class="run-btn" onclick="runCode(this, '--- Using || (problem) ---\n10  ← correct\n0   ← WRONG, 0 is a valid score!\n--- Using ?? (solution) ---\n10  ← correct\n0   ← correct, 0 is kept!')">▶ Run</button>
+      </div>
+      <pre><span class="kw">const</span> scores <span class="op">=</span> { alice: <span class="num">10</span>, bob: <span class="num">0</span> };  <span class="cmt">// Bob scored zero — valid!</span>
+
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="str">"--- Using || (problem) ---"</span>);
+<span class="fn">console</span>.<span class="fn">log</span>(scores.alice <span class="op">||</span> <span class="str">"N/A"</span>);   <span class="cmt">// 10  ← fine</span>
+<span class="fn">console</span>.<span class="fn">log</span>(scores.bob   <span class="op">||</span> <span class="str">"N/A"</span>);   <span class="cmt">// "N/A" ← BUG! 0 is falsy</span>
+
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="str">"--- Using ?? (solution) ---"</span>);
+<span class="fn">console</span>.<span class="fn">log</span>(scores.alice <span class="op">??</span> <span class="str">"N/A"</span>);   <span class="cmt">// 10  ← fine</span>
+<span class="fn">console</span>.<span class="fn">log</span>(scores.bob   <span class="op">??</span> <span class="str">"N/A"</span>);   <span class="cmt">// 0   ← correct!</span>
+<span class="cmt">// ?? only triggers for null / undefined — not 0 or ""</span></pre>
+      <div class="output-box"><div class="output-label">OUTPUT</div></div>
+    </div>
+
+    <!-- Optional chaining -->
+    <p class="prose" style="margin-top:32px;">
+      <strong><code>?.</code> (Optional Chaining)</strong> lets you safely access deeply nested properties without crashing when an intermediate value is <code>null</code> or <code>undefined</code>. Instead of an error, it returns <code>undefined</code>.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">JavaScript — ?. Optional Chaining</span>
+        <button class="run-btn" onclick="runCode(this, 'Warsaw\nundefined\nundefined\n--- Combined with ?? ---\nWarsaw\nUnknown city\nno phone on file')">▶ Run</button>
+      </div>
+      <pre><span class="kw">const</span> users <span class="op">=</span> [
+  { name: <span class="str">"Alice"</span>, address: { city: <span class="str">"Warsaw"</span> } },
+  { name: <span class="str">"Bob"</span>   }   <span class="cmt">// no address!</span>
+];
+
+<span class="cmt">// Without optional chaining — would CRASH on Bob:</span>
+<span class="cmt">// console.log(users[1].address.city) → TypeError!</span>
+
+<span class="cmt">// With ?. — safe, returns undefined instead of crashing</span>
+<span class="fn">console</span>.<span class="fn">log</span>(users[<span class="num">0</span>]?.address?.city);   <span class="cmt">// "Warsaw"</span>
+<span class="fn">console</span>.<span class="fn">log</span>(users[<span class="num">1</span>]?.address?.city);   <span class="cmt">// undefined — no crash!</span>
+<span class="fn">console</span>.<span class="fn">log</span>(users[<span class="num">5</span>]?.address?.city);   <span class="cmt">// undefined — index out of bounds, no crash!</span>
+
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="str">"--- Combined with ?? ---"</span>);
+<span class="cmt">// ?. and ?? are best friends — access safely, then provide fallback</span>
+<span class="fn">console</span>.<span class="fn">log</span>(users[<span class="num">0</span>]?.address?.city <span class="op">??</span> <span class="str">"Unknown city"</span>);  <span class="cmt">// Warsaw</span>
+<span class="fn">console</span>.<span class="fn">log</span>(users[<span class="num">1</span>]?.address?.city <span class="op">??</span> <span class="str">"Unknown city"</span>);  <span class="cmt">// Unknown city</span>
+
+<span class="cmt">// Also works for optional method calls</span>
+<span class="kw">const</span> phone <span class="op">=</span> users[<span class="num">1</span>]?.contact?.getPhone?.() <span class="op">??</span> <span class="str">"no phone on file"</span>;
+<span class="fn">console</span>.<span class="fn">log</span>(phone);</pre>
+      <div class="output-box"><div class="output-label">OUTPUT</div></div>
+    </div>
+
+    <div class="callout tip">
+      <span class="callout-icon">✅</span>
+      <div class="callout-body">
+        <strong>Quick decision guide:</strong><br>
+        Use <code>||</code> when any falsy value should trigger the fallback (e.g. empty string, 0).<br>
+        Use <code>??</code> when only <code>null</code> / <code>undefined</code> should trigger it — <code>0</code> and <code>""</code> are valid.<br>
+        Use <code>?.</code> whenever a property might not exist to avoid TypeErrors.
+      </div>
+    </div>
+
+    <!-- Quiz -->
+    <div class="quiz">
+      <div class="quiz-q">What does <code>0 ?? "default"</code> return?</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(this, false)">"default"</button>
+        <button class="quiz-opt" onclick="answer(this, true)">0</button>
+        <button class="quiz-opt" onclick="answer(this, false)">null</button>
+        <button class="quiz-opt" onclick="answer(this, false)">undefined</button>
+      </div>
+      <div class="quiz-feedback"><code>??</code> only falls back on <code>null</code> or <code>undefined</code>. Since <code>0</code> is neither, it is returned as-is. Compare with <code>0 || "default"</code> which would return <code>"default"</code> because <code>0</code> is falsy.</div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- SECTION 5 -->
+  <section class="section" id="conditionals">
+    <div class="section-header">
+      <span class="section-num">05</span>
+      <h2 class="section-title">Conditionals</h2>
+    </div>
+
+    <p class="prose">
+      Conditionals let your program <strong>make decisions</strong>. The <code>if / else if / else</code> structure executes different blocks of code depending on whether a condition is true or false.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">JavaScript — if / else</span>
+        <button class="run-btn" onclick="runCode(this, 'Great score! You passed with distinction.')">▶ Run</button>
+      </div>
+      <pre><span class="kw">const</span> score <span class="op">=</span> <span class="num">87</span>;
+
+<span class="kw">if</span> (score <span class="op">>=</span> <span class="num">90</span>) {
+  <span class="fn">console</span>.<span class="fn">log</span>(<span class="str">"Excellent! You got an A."</span>);
+} <span class="kw">else if</span> (score <span class="op">>=</span> <span class="num">75</span>) {
+  <span class="fn">console</span>.<span class="fn">log</span>(<span class="str">"Great score! You passed with distinction."</span>);
+} <span class="kw">else if</span> (score <span class="op">>=</span> <span class="num">50</span>) {
+  <span class="fn">console</span>.<span class="fn">log</span>(<span class="str">"You passed."</span>);
+} <span class="kw">else</span> {
+  <span class="fn">console</span>.<span class="fn">log</span>(<span class="str">"Try again next time."</span>);
+}</pre>
+      <div class="output-box">
+        <div class="output-label">OUTPUT</div>
+      </div>
+    </div>
+
+    <p class="prose">
+      For simple value-matching, <code>switch</code> is often cleaner than a long chain of <code>else if</code> statements:
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">JavaScript — switch</span>
+        <button class="run-btn" onclick="runCode(this, 'Start your week strong! 💪')">▶ Run</button>
+      </div>
+      <pre><span class="kw">const</span> day <span class="op">=</span> <span class="str">"Monday"</span>;
+
+<span class="kw">switch</span> (day) {
+  <span class="kw">case</span> <span class="str">"Monday"</span>:
+    <span class="fn">console</span>.<span class="fn">log</span>(<span class="str">"Start your week strong! 💪"</span>);
+    <span class="kw">break</span>;
+  <span class="kw">case</span> <span class="str">"Friday"</span>:
+    <span class="fn">console</span>.<span class="fn">log</span>(<span class="str">"Almost the weekend! 🎉"</span>);
+    <span class="kw">break</span>;
+  <span class="kw">default</span>:
+    <span class="fn">console</span>.<span class="fn">log</span>(<span class="str">"Just another day."</span>);
+}</pre>
+      <div class="output-box">
+        <div class="output-label">OUTPUT</div>
+      </div>
+    </div>
+
+    <!-- Quiz 2 -->
+    <div class="quiz">
+      <div class="quiz-q">What does the <code>break</code> keyword do inside a <code>switch</code> statement?</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(this, false)">It breaks the program and throws an error</button>
+        <button class="quiz-opt" onclick="answer(this, false)">It skips to the next case</button>
+        <button class="quiz-opt" onclick="answer(this, true)">It stops execution and exits the switch block</button>
+        <button class="quiz-opt" onclick="answer(this, false)">It is required for the default case only</button>
+      </div>
+      <div class="quiz-feedback">Without <code>break</code>, execution "falls through" into the next case — a common source of bugs for beginners!</div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- SECTION 6 -->
+  <section class="section" id="loops">
+    <div class="section-header">
+      <span class="section-num">06</span>
+      <h2 class="section-title">Loops</h2>
+    </div>
+
+    <p class="prose">
+      Loops let you <strong>repeat a block of code</strong> without writing it multiple times. JavaScript offers several looping constructs — choose the one that fits your situation.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">JavaScript — for loop</span>
+        <button class="run-btn" onclick="runCode(this, 'Lap 1\nLap 2\nLap 3\nLap 4\nLap 5')">▶ Run</button>
+      </div>
+      <pre><span class="cmt">// Classic for loop: init ; condition ; increment</span>
+<span class="kw">for</span> (<span class="kw">let</span> i <span class="op">=</span> <span class="num">1</span>; i <span class="op"><=</span> <span class="num">5</span>; i<span class="op">++</span>) {
+  <span class="fn">console</span>.<span class="fn">log</span>(<span class="str">`Lap <span class="op">${</span>i<span class="op">}</span>`</span>);
+}</pre>
+      <div class="output-box">
+        <div class="output-label">OUTPUT</div>
+      </div>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">JavaScript — while & for...of</span>
+        <button class="run-btn" onclick="runCode(this, 'Countdown: 3\nCountdown: 2\nCountdown: 1\nBlast off! 🚀\n---\nApple\nBanana\nCherry')">▶ Run</button>
+      </div>
+      <pre><span class="cmt">// while loop — runs as long as condition is true</span>
+<span class="kw">let</span> count <span class="op">=</span> <span class="num">3</span>;
+<span class="kw">while</span> (count <span class="op">></span> <span class="num">0</span>) {
+  <span class="fn">console</span>.<span class="fn">log</span>(<span class="str">`Countdown: <span class="op">${</span>count<span class="op">}</span>`</span>);
+  count<span class="op">--</span>;
+}
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="str">"Blast off! 🚀"</span>);
+
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="str">"---"</span>);
+
+<span class="cmt">// for...of — best way to loop over arrays</span>
+<span class="kw">const</span> fruits <span class="op">=</span> [<span class="str">"Apple"</span>, <span class="str">"Banana"</span>, <span class="str">"Cherry"</span>];
+<span class="kw">for</span> (<span class="kw">const</span> fruit <span class="kw">of</span> fruits) {
+  <span class="fn">console</span>.<span class="fn">log</span>(fruit);
+}</pre>
+      <div class="output-box">
+        <div class="output-label">OUTPUT</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- SECTION 7 -->
+  <section class="section" id="functions">
+    <div class="section-header">
+      <span class="section-num">07</span>
+      <h2 class="section-title">Functions</h2>
+    </div>
+
+    <p class="prose">
+      A <strong>function</strong> is a reusable block of code that performs a specific task. Instead of writing the same code over and over, you define it once in a function and call it whenever needed. Functions are the foundation of organized, maintainable code.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">JavaScript — Function Declaration</span>
+        <button class="run-btn" onclick="runCode(this, 'Hello, Alice!\nHello, Bob!')">▶ Run</button>
+      </div>
+      <pre><span class="cmt">// Define once...</span>
+<span class="kw">function</span> <span class="fn">greet</span>(name) {
+  <span class="kw">return</span> <span class="str">`Hello, <span class="op">${</span>name<span class="op">}</span>!`</span>;
+}
+
+<span class="cmt">// ...call many times</span>
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="fn">greet</span>(<span class="str">"Alice"</span>));
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="fn">greet</span>(<span class="str">"Bob"</span>));</pre>
+      <div class="output-box">
+        <div class="output-label">OUTPUT</div>
+      </div>
+    </div>
+
+    <p class="prose">
+      Modern JavaScript also supports <strong>arrow functions</strong> — a shorter, cleaner syntax especially popular for small, inline functions:
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">JavaScript — Arrow Functions</span>
+        <button class="run-btn" onclick="runCode(this, '25\n78.54')">▶ Run</button>
+      </div>
+      <pre><span class="cmt">// Traditional function:</span>
+<span class="cmt">// function square(n) { return n * n; }</span>
+
+<span class="cmt">// Arrow function — same thing, shorter:</span>
+<span class="kw">const</span> <span class="fn">square</span> <span class="op">=</span> (n) <span class="op">=></span> n <span class="op">*</span> n;
+
+<span class="cmt">// With multiple lines, use curly braces + return:</span>
+<span class="kw">const</span> <span class="fn">circleArea</span> <span class="op">=</span> (radius) <span class="op">=></span> {
+  <span class="kw">const</span> pi <span class="op">=</span> <span class="num">3.14159</span>;
+  <span class="kw">return</span> pi <span class="op">*</span> radius <span class="op">**</span> <span class="num">2</span>;
+};
+
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="fn">square</span>(<span class="num">5</span>));
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="fn">circleArea</span>(<span class="num">5</span>).<span class="fn">toFixed</span>(<span class="num">2</span>));</pre>
+      <div class="output-box">
+        <div class="output-label">OUTPUT</div>
+      </div>
+    </div>
+
+    <!-- Quiz 3 -->
+    <div class="quiz">
+      <div class="quiz-q">What does the <code>return</code> keyword do inside a function?</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(this, false)">It logs a value to the console</button>
+        <button class="quiz-opt" onclick="answer(this, false)">It declares a variable</button>
+        <button class="quiz-opt" onclick="answer(this, true)">It sends a value back to the caller and exits the function</button>
+        <button class="quiz-opt" onclick="answer(this, false)">It repeats the function</button>
+      </div>
+      <div class="quiz-feedback">A function without <code>return</code> returns <code>undefined</code> by default. Use <code>return</code> when you want the function to produce a value you can use elsewhere.</div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- SECTION 8: PLAYGROUND -->
+  <section class="section" id="playground">
+    <div class="section-header">
+      <span class="section-num">08</span>
+      <h2 class="section-title">Live Playground</h2>
+    </div>
+
+    <p class="prose">
+      Time to practice! Write your own JavaScript code below and run it. Try combining variables, a function, and a loop to see everything working together.
+    </p>
+
+    <div class="playground">
+      <div class="playground-header">
+        <span class="playground-title">⚡ Interactive Editor</span>
+        <button class="playground-run" onclick="runPlayground()">▶ Run Code</button>
+      </div>
+      <textarea id="playgroundCode" spellcheck="false">// Try writing your own code here!
+// Example: a function that checks if a number is even or odd
+
+const checkNumber = (n) => {
+  if (n % 2 === 0) {
+    return `${n} is even`;
+  } else {
+    return `${n} is odd`;
+  }
+};
+
+for (let i = 1; i <= 6; i++) {
+  console.log(checkNumber(i));
+}</textarea>
+      <div class="playground-output" id="playgroundOutput">// Output will appear here...</div>
+    </div>
+
+    <div class="callout tip">
+      <span class="callout-icon">🎯</span>
+      <div class="callout-body"><strong>Challenge:</strong> Modify the playground to print the first 10 numbers of the Fibonacci sequence: 0, 1, 1, 2, 3, 5, 8, 13, 21, 34…</div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- SUMMARY -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-num" style="background:rgba(78,207,138,0.12);border-color:rgba(78,207,138,0.3);color:var(--accent4);">✓</span>
+      <h2 class="section-title">Lesson Summary</h2>
+    </div>
+
+    <p class="prose">You've covered the core building blocks of JavaScript. Here's what you now know:</p>
+
+    <div class="summary-grid">
+      <div class="summary-item"><span class="summary-dot" style="background:var(--accent2)"></span>What JavaScript is and where it runs</div>
+      <div class="summary-item"><span class="summary-dot" style="background:var(--accent)"></span><code>const</code>, <code>let</code> variable declarations</div>
+      <div class="summary-item"><span class="summary-dot" style="background:var(--accent3)"></span>Primitive data types & <code>typeof</code></div>
+      <div class="summary-item"><span class="summary-dot" style="background:var(--accent4)"></span>Template literals with <code>${"{}"}</code></div>
+      <div class="summary-item"><span class="summary-dot" style="background:var(--accent2)"></span>Arithmetic & comparison operators</div>
+      <div class="summary-item"><span class="summary-dot" style="background:var(--accent3)"></span>Falsy values: <code>0</code>, <code>""</code>, <code>false</code>, <code>null</code>, <code>undefined</code>, <code>NaN</code></div>
+      <div class="summary-item"><span class="summary-dot" style="background:var(--accent4)"></span><code>&&</code> and <code>||</code> short-circuit evaluation</div>
+      <div class="summary-item"><span class="summary-dot" style="background:var(--accent)"></span><code>??</code> nullish coalescing & <code>?.</code> optional chaining</div>
+      <div class="summary-item"><span class="summary-dot" style="background:var(--accent)"></span><code>if / else if / else</code> logic</div>
+      <div class="summary-item"><span class="summary-dot" style="background:var(--accent3)"></span><code>switch</code> statements</div>
+      <div class="summary-item"><span class="summary-dot" style="background:var(--accent4)"></span><code>for</code>, <code>while</code>, <code>for...of</code> loops</div>
+      <div class="summary-item"><span class="summary-dot" style="background:var(--accent2)"></span>Function declarations & arrow functions</div>
+    </div>
+
+    <div class="callout info">
+      <span class="callout-icon">🚀</span>
+      <div class="callout-body"><strong>What's next?</strong> Lesson 02 covers Arrays & Objects in depth, along with powerful built-in methods like <code>.map()</code>, <code>.filter()</code>, and <code>.reduce()</code> that make working with data elegant and expressive.</div>
+    </div>
+  </section>
+
+</main>
+
+  <!-- ECMASCRIPT REFERENCE -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-num" style="background:rgba(224,92,92,0.12);border-color:rgba(224,92,92,0.3);color:var(--accent3);">📄</span>
+      <h2 class="section-title">Official ECMAScript Specification</h2>
+    </div>
+
+    <p class="prose">
+      JavaScript is built on top of <strong>ECMAScript</strong> — the official language standard maintained by Ecma International. The specification precisely defines how the language works under the hood. As you grow as a developer, reading the spec becomes an invaluable skill for understanding edge cases and language behaviour.
+    </p>
+
+    <div class="cards">
+      <div class="card" style="border-color: rgba(247,201,72,0.3);">
+        <div class="card-icon">⚡</div>
+        <div class="card-title">Living Specification (Latest Draft)</div>
+        <div class="card-desc" style="margin-bottom:16px;">The most up-to-date version of ECMA-262, continuously updated with finished proposals. This is the go-to reference for current JavaScript behaviour.</div>
+        <a href="https://tc39.es/ecma262/" target="_blank" rel="noopener noreferrer" style="display:inline-block; background:var(--accent); color:#000; font-family:'Space Mono',monospace; font-size:11px; font-weight:700; letter-spacing:1px; text-transform:uppercase; padding:8px 16px; text-decoration:none; transition:opacity 0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">→ tc39.es/ecma262</a>
+      </div>
+      <div class="card" style="border-color: rgba(91,141,238,0.3);">
+        <div class="card-icon">📘</div>
+        <div class="card-title">ECMA-262 Official Standard (Ecma International)</div>
+        <div class="card-desc" style="margin-bottom:16px;">The formal published edition of the ECMAScript Language Specification — ECMA-262 — hosted on the Ecma International website.</div>
+        <a href="https://ecma-international.org/publications-and-standards/standards/ecma-262/" target="_blank" rel="noopener noreferrer" style="display:inline-block; background:var(--accent2); color:#fff; font-family:'Space Mono',monospace; font-size:11px; font-weight:700; letter-spacing:1px; text-transform:uppercase; padding:8px 16px; text-decoration:none; transition:opacity 0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">→ ecma-international.org</a>
+      </div>
+    </div>
+
+    <div class="callout warning">
+      <span class="callout-icon">📖</span>
+      <div class="callout-body"><strong>Note for beginners:</strong> The ECMAScript spec is a dense, formal document written for language implementers — not beginners. Don't be discouraged if it feels overwhelming at first. Come back to it once you're comfortable writing JavaScript day-to-day. For now, <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript" target="_blank" rel="noopener noreferrer" style="color:var(--accent2);">MDN Web Docs</a> is the more beginner-friendly reference.</div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+<footer>
+  <p>Introduction to JavaScript · Lesson 01 of 10</p>
+  <p style="margin-top:8px; color: #444460;">Built for curious minds. Code fearlessly.</p>
+</footer>
+
+<script>
+  // Progress bar
+  window.addEventListener('scroll', () => {
+    const scrollTop = document.documentElement.scrollTop;
+    const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+    const progress = Math.round((scrollTop / scrollHeight) * 100);
+    document.getElementById('progressBar').style.width = progress + '%';
+    document.getElementById('progressLabel').textContent = `${progress}% — keep scrolling`;
+  });
+
+  // Intersection observer for section animations
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) e.target.classList.add('visible');
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.section').forEach(s => observer.observe(s));
+
+  // Active nav
+  const navLinks = document.querySelectorAll('nav a');
+  const sections = document.querySelectorAll('section[id]');
+
+  const sectionObserver = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        navLinks.forEach(a => a.classList.remove('active'));
+        const active = document.querySelector(`nav a[href="#${e.target.id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { threshold: 0.4 });
+
+  sections.forEach(s => sectionObserver.observe(s));
+
+  // Run code buttons
+  function runCode(btn, output) {
+    const block = btn.closest('.code-block');
+    const outBox = block.querySelector('.output-box');
+    const label = outBox.querySelector('.output-label');
+    outBox.innerHTML = `<div class="output-label">OUTPUT</div>${output.split('\n').map(l => `<div>${l}</div>`).join('')}`;
+    outBox.classList.add('show');
+    btn.textContent = '✓ Ran';
+    btn.style.background = 'var(--accent4)';
+    setTimeout(() => { btn.textContent = '▶ Run'; btn.style.background = ''; }, 2000);
+  }
+
+  // Quiz
+  function answer(btn, correct) {
+    const quiz = btn.closest('.quiz');
+    if (quiz.dataset.answered) return;
+    quiz.dataset.answered = '1';
+    const feedback = quiz.querySelector('.quiz-feedback');
+    btn.classList.add(correct ? 'correct' : 'wrong');
+    feedback.classList.add('show', correct ? 'ok' : 'ko');
+    if (!correct) {
+      feedback.textContent = '✗ Not quite. ' + feedback.textContent;
+    } else {
+      feedback.textContent = '✓ Correct! ' + feedback.textContent;
+    }
+    quiz.querySelectorAll('.quiz-opt').forEach(b => { if (b !== btn) b.style.opacity = '0.4'; b.style.cursor = 'default'; });
+  }
+
+  // Playground
+  function runPlayground() {
+    const code = document.getElementById('playgroundCode').value;
+    const output = document.getElementById('playgroundOutput');
+    const logs = [];
+    const originalLog = console.log;
+    console.log = (...args) => { logs.push(args.map(String).join(' ')); };
+    try {
+      eval(code);
+      output.innerHTML = logs.length ? logs.map(l => `<div>${l}</div>`).join('') : '<div style="color:var(--muted)">// No output</div>';
+    } catch(e) {
+      output.innerHTML = `<div class="err">⚠ ${e.message}</div>`;
+    }
+    console.log = originalLog;
+  }
+
+  // Keyboard shortcut: Ctrl+Enter to run playground
+  document.getElementById('playgroundCode').addEventListener('keydown', e => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); runPlayground(); }
+  });
+</script>
+</body>
+</html>
