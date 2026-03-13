@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JavaScript: Functions, Objects & Arrays</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#0c0e14; --bg2:#13151e; --bg3:#1a1d29;
+    --border:rgba(255,255,255,0.07); --border2:rgba(255,255,255,0.13);
+    --text:#e8eaf0; --muted:#7c8299;
+    --fn-color:#7c6af7; --obj-color:#f5a623; --arr-color:#3ecf8e;
+    --danger:#f56565; --radius:12px; --radius-sm:8px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:16px;line-height:1.65;min-height:100vh;}
+
+  /* HERO */
+  .hero{position:relative;overflow:hidden;padding:100px 40px 80px;text-align:center;}
+  .hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(124,106,247,.07)1px,transparent 1px),linear-gradient(90deg,rgba(124,106,247,.07)1px,transparent 1px);background-size:50px 50px;mask-image:radial-gradient(ellipse 80% 80% at 50% 0%,black 30%,transparent 100%);}
+  .hero-glow{position:absolute;width:600px;height:600px;top:-200px;left:50%;transform:translateX(-50%);background:radial-gradient(circle,rgba(124,106,247,.18)0%,transparent 70%);pointer-events:none;}
+  .badge{display:inline-block;background:rgba(124,106,247,.15);border:1px solid rgba(124,106,247,.3);color:#a99df5;font-family:'JetBrains Mono',monospace;font-size:12px;padding:5px 14px;border-radius:100px;margin-bottom:28px;letter-spacing:.05em;}
+  .hero h1{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(36px,6vw,72px);line-height:1.1;color:#fff;position:relative;}
+  .hl-fn{color:var(--fn-color);} .hl-obj{color:var(--obj-color);} .hl-arr{color:var(--arr-color);}
+  .hero-sub{margin:20px auto 0;max-width:560px;color:var(--muted);font-size:17px;font-weight:300;position:relative;}
+  .hero-chips{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:36px;position:relative;}
+  .chip{display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border2);border-radius:100px;padding:8px 18px;font-size:13px;font-weight:500;color:var(--muted);}
+  .chip .dot{width:7px;height:7px;border-radius:50%;}
+
+  /* NAV */
+  .sticky-nav{position:sticky;top:0;z-index:100;background:rgba(12,14,20,.88);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;gap:2px;height:56px;overflow-x:auto;}
+  .sticky-nav a{white-space:nowrap;font-size:13px;font-weight:500;color:var(--muted);text-decoration:none;padding:6px 13px;border-radius:var(--radius-sm);transition:all .15s;font-family:'DM Sans',sans-serif;}
+  .sticky-nav a:hover{color:var(--text);background:var(--bg3);}
+  .sticky-nav a.active{color:#fff;background:var(--bg3);}
+  .nav-sep{width:1px;height:20px;background:var(--border);margin:0 2px;flex-shrink:0;}
+
+  /* LAYOUT */
+  .page{max-width:900px;margin:0 auto;padding:0 28px 100px;}
+
+  /* SECTION INTRO */
+  .section-intro{padding:80px 0 40px;display:flex;align-items:flex-start;gap:24px;}
+  .section-icon{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;margin-top:4px;}
+  .section-intro h2{font-family:'Syne',sans-serif;font-size:34px;font-weight:800;color:#fff;line-height:1.2;margin-bottom:10px;}
+  .section-intro p{color:var(--muted);font-size:15px;max-width:600px;}
+  .section-tag{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;margin-bottom:8px;}
+
+  /* CONCEPT CARD */
+  .concept{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:28px 32px;margin-bottom:20px;position:relative;overflow:hidden;}
+  .concept::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+  .concept.fn::before{background:var(--fn-color);}
+  .concept.obj::before{background:var(--obj-color);}
+  .concept.arr::before{background:var(--arr-color);}
+  .concept.neutral::before{background:var(--border2);}
+  .concept-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;font-weight:600;margin-bottom:8px;}
+  .concept.fn .concept-label{color:var(--fn-color);}
+  .concept.obj .concept-label{color:var(--obj-color);}
+  .concept.arr .concept-label{color:var(--arr-color);}
+  .concept.neutral .concept-label{color:var(--muted);}
+  .concept h3{font-family:'Syne',sans-serif;font-size:19px;font-weight:700;color:#fff;margin-bottom:10px;}
+  .concept p{color:#9aa0b8;font-size:14px;line-height:1.7;margin-bottom:14px;}
+  .concept p:last-child{margin-bottom:0;}
+
+  /* CODE */
+  .code-wrap{background:#090b10;border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;margin:16px 0;font-family:'JetBrains Mono',monospace;font-size:13px;}
+  .code-header{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid var(--border);background:rgba(255,255,255,.02);}
+  .code-dots{display:flex;gap:6px;}
+  .code-dots span{width:10px;height:10px;border-radius:50%;}
+  .code-dots span:nth-child(1){background:#ff5f57;}.code-dots span:nth-child(2){background:#febc2e;}.code-dots span:nth-child(3){background:#28c840;}
+  .code-filename{font-size:11px;color:var(--muted);letter-spacing:.04em;}
+  pre.code{padding:20px;overflow-x:auto;line-height:1.8;tab-size:2;}
+  .kw{color:#c792ea;}.str{color:#c3e88d;}.num{color:#f78c6c;}.fn{color:#82aaff;}.prop{color:#ffcb6b;}.cmt{color:#546e7a;font-style:italic;}.op{color:#89ddff;}
+
+  /* COMPARE TABLE */
+  .compare-table{width:100%;border-collapse:collapse;margin:16px 0;font-size:13px;}
+  .compare-table th{background:var(--bg3);color:var(--muted);font-weight:500;padding:10px 16px;text-align:left;border:1px solid var(--border);font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.06em;}
+  .compare-table td{padding:11px 16px;border:1px solid var(--border);color:#9aa0b8;vertical-align:top;line-height:1.6;}
+  .compare-table tr:hover td{background:rgba(255,255,255,.015);}
+  .compare-table code{font-family:'JetBrains Mono',monospace;font-size:12px;color:#a99df5;}
+  .tag-yes{color:var(--arr-color);font-weight:600;}.tag-no{color:var(--danger);font-weight:600;}
+
+  /* SANDBOX */
+  .sandbox{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin:24px 0 32px;}
+  .sandbox-header{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--border);background:var(--bg3);}
+  .sandbox-title{display:flex;align-items:center;gap:10px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:#fff;}
+  .sandbox-icon-wrap{width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;}
+  .sandbox-hint{font-size:12px;color:var(--muted);font-weight:300;}
+  .sandbox-body{display:grid;grid-template-columns:1fr 1fr;min-height:260px;}
+  @media(max-width:680px){.sandbox-body{grid-template-columns:1fr;}}
+  .editor-pane{position:relative;border-right:1px solid var(--border);}
+  textarea.editor{width:100%;height:100%;min-height:260px;background:#090b10;color:#cdd5f0;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.75;padding:20px;border:none;outline:none;resize:none;tab-size:2;}
+  .run-bar{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-top:1px solid var(--border);background:rgba(255,255,255,.015);}
+  .run-btn{display:flex;align-items:center;gap:8px;background:var(--fn-color);color:#fff;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;padding:8px 20px;border-radius:var(--radius-sm);transition:all .15s;}
+  .run-btn:hover{filter:brightness(1.15);transform:translateY(-1px);}
+  .run-btn:active{transform:scale(.97);}
+  .kbd{font-family:'JetBrains Mono',monospace;font-size:10px;background:var(--bg3);border:1px solid var(--border2);border-radius:4px;padding:2px 7px;color:var(--muted);}
+  .output-pane{background:#060810;padding:20px;overflow-y:auto;min-height:260px;display:flex;flex-direction:column;}
+  .output-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;flex-shrink:0;}
+  .output-content{font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.8;color:var(--arr-color);white-space:pre-wrap;word-break:break-word;flex:1;}
+  .output-content.empty{color:#2a2e42;}.output-content.err{color:var(--danger);}
+  .output-line-num{color:#2a2e42;user-select:none;margin-right:12px;display:inline-block;min-width:18px;text-align:right;}
+
+  /* CALLOUT */
+  .callout{display:flex;gap:14px;background:rgba(124,106,247,.06);border:1px solid rgba(124,106,247,.18);border-radius:var(--radius-sm);padding:16px 20px;margin:20px 0;}
+  .callout.warn{background:rgba(245,166,35,.06);border-color:rgba(245,166,35,.22);}
+  .callout-icon{font-size:18px;flex-shrink:0;line-height:1.5;}
+  .callout p{font-size:14px;color:#a8aecc;line-height:1.6;}
+  .callout strong{color:#c5c8e2;font-weight:500;}
+
+  /* TWO COL */
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:16px 0;}
+  @media(max-width:600px){.two-col{grid-template-columns:1fr;}}
+  .mini-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:18px 20px;}
+  .mini-card .mini-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
+  .mini-card .mini-val{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--text);}
+  .mini-card p{font-size:13px;color:var(--muted);margin-top:6px;line-height:1.5;}
+
+  /* METHOD GRID */
+  .method-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin:16px 0;}
+  .method-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;transition:border-color .15s;}
+  .method-card:hover{border-color:var(--border2);}
+  .method-name{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;color:var(--arr-color);margin-bottom:4px;}
+  .method-desc{font-size:12px;color:var(--muted);line-height:1.5;}
+
+  /* QUIZ */
+  .quiz-section{padding-top:72px;}
+  .quiz-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:32px;margin-bottom:20px;}
+  .quiz-num{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:.1em;margin-bottom:12px;}
+  .quiz-q{font-family:'Syne',sans-serif;font-size:17px;font-weight:700;color:#fff;margin-bottom:20px;line-height:1.45;}
+  .quiz-code{background:#090b10;border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 18px;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.7;margin-bottom:20px;white-space:pre;overflow-x:auto;}
+  .quiz-opts{display:flex;flex-direction:column;gap:10px;}
+  .quiz-opt{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 18px;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--text);transition:all .15s;text-align:left;display:flex;align-items:center;gap:12px;}
+  .quiz-opt:hover:not([disabled]){border-color:var(--border2);background:rgba(255,255,255,.04);}
+  .quiz-opt.correct{border-color:var(--arr-color);background:rgba(62,207,142,.08);color:var(--arr-color);}
+  .quiz-opt.wrong{border-color:var(--danger);background:rgba(245,101,101,.08);color:var(--danger);}
+  .opt-letter{width:22px;height:22px;border-radius:50%;background:var(--bg2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;font-family:'DM Sans',sans-serif;font-weight:600;}
+  .quiz-opt.correct .opt-letter{background:rgba(62,207,142,.2);border-color:var(--arr-color);}
+  .quiz-opt.wrong .opt-letter{background:rgba(245,101,101,.2);border-color:var(--danger);}
+  .quiz-feedback{margin-top:14px;padding:12px 16px;border-radius:var(--radius-sm);font-size:13px;line-height:1.5;display:none;}
+  .quiz-feedback.show{display:block;}
+  .quiz-feedback.ok{background:rgba(62,207,142,.08);color:#7de8b8;border:1px solid rgba(62,207,142,.2);}
+  .quiz-feedback.no{background:rgba(245,101,101,.08);color:#f9a8a8;border:1px solid rgba(245,101,101,.2);}
+
+  /* PROGRESS */
+  .progress-wrap{position:fixed;bottom:0;left:0;right:0;height:3px;background:var(--bg3);z-index:200;}
+  .progress-fill{height:100%;background:linear-gradient(90deg,var(--fn-color),var(--arr-color));transition:width .3s ease;width:0%;}
+
+  .divider{border:none;border-top:1px solid var(--border);margin:60px 0;}
+  .footer{text-align:center;padding:60px 40px 40px;color:var(--muted);font-size:13px;border-top:1px solid var(--border);}
+  .footer strong{color:var(--text);font-weight:500;}
+  .fade-in{opacity:0;transform:translateY(18px);transition:opacity .5s ease,transform .5s ease;}
+  .fade-in.visible{opacity:1;transform:none;}
+</style>
+</head>
+<body>
+
+<div class="progress-wrap"><div class="progress-fill" id="progress"></div></div>
+
+<div class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-glow"></div>
+  <div class="badge">JavaScript Foundations · Beginner Lecture</div>
+  <h1><span class="hl-fn">Functions</span>,<br><span class="hl-obj">Objects</span> &amp;<br><span class="hl-arr">Arrays</span></h1>
+  <p class="hero-sub">The three building blocks you'll use in every JavaScript program you ever write.</p>
+  <div class="hero-chips">
+    <div class="chip"><span class="dot" style="background:var(--fn-color)"></span>Functions &amp; Closures</div>
+    <div class="chip"><span class="dot" style="background:var(--obj-color)"></span>Objects &amp; this</div>
+    <div class="chip"><span class="dot" style="background:var(--arr-color)"></span>Arrays</div>
+    <div class="chip"><span class="dot" style="background:#5cbbff"></span>7 Live Sandboxes</div>
+    <div class="chip"><span class="dot" style="background:#ff7eb3"></span>10 Quiz Questions</div>
+  </div>
+</div>
+
+<nav class="sticky-nav">
+  <a href="#functions" class="active">⚡ Functions</a>
+  <div class="nav-sep"></div>
+  <a href="#objects">📦 Objects</a>
+  <div class="nav-sep"></div>
+  <a href="#arrays">📋 Arrays</a>
+  <div class="nav-sep"></div>
+  <a href="#combined">🔗 Together</a>
+  <div class="nav-sep"></div>
+  <a href="#quiz">🎯 Quiz</a>
+</nav>
+
+<div class="page">
+
+<!-- ════════════ CHAPTER 1 — FUNCTIONS ════════════ -->
+<div id="functions" class="section-intro fade-in">
+  <div class="section-icon" style="background:rgba(124,106,247,.12)">⚡</div>
+  <div>
+    <div class="section-tag" style="color:var(--fn-color)">Chapter 1</div>
+    <h2>Functions</h2>
+    <p>A function is a reusable block of code. Understanding functions deeply — declarations vs expressions, closures, and how <code style="color:#a99df5">this</code> works with arrows — unlocks everything else in JavaScript.</p>
+  </div>
+</div>
+
+<!-- Declaration vs Expression -->
+<div class="concept fn fade-in">
+  <div class="concept-label">Declaration vs Expression</div>
+  <h3>Two ways to define a function</h3>
+  <p>They look similar but behave differently in one critical way: <strong style="color:#c5c8e2">hoisting</strong>. The JavaScript engine processes declarations before any code runs — expressions are not.</p>
+  <div class="code-wrap">
+    <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-filename">declaration-vs-expression.js</span></div>
+    <pre class="code"><span class="cmt">// ── FUNCTION DECLARATION ─────────────────────────────</span>
+<span class="cmt">// Hoisted — can be called BEFORE it appears in the file</span>
+
+console.<span class="fn">log</span>(<span class="fn">greet</span>(<span class="str">"Alice"</span>));  <span class="cmt">// ✅ Works! "Hello, Alice"</span>
+
+<span class="kw">function</span> <span class="fn">greet</span>(name) {
+  <span class="kw">return</span> <span class="str">"Hello, "</span> <span class="op">+</span> name;
+}
+
+
+<span class="cmt">// ── FUNCTION EXPRESSION ──────────────────────────────</span>
+<span class="cmt">// The variable "sayBye" exists, but holds undefined until this line</span>
+
+<span class="cmt">// console.log(sayBye("Bob")); ← ❌ TypeError: sayBye is not a function</span>
+
+<span class="kw">const</span> <span class="fn">sayBye</span> <span class="op">=</span> <span class="kw">function</span>(name) {
+  <span class="kw">return</span> <span class="str">"Goodbye, "</span> <span class="op">+</span> name;
+};
+
+console.<span class="fn">log</span>(<span class="fn">sayBye</span>(<span class="str">"Bob"</span>));  <span class="cmt">// ✅ "Goodbye, Bob"</span>
+
+
+<span class="cmt">// ── NAMED FUNCTION EXPRESSION ────────────────────────</span>
+<span class="cmt">// Useful for self-reference and better stack traces</span>
+
+<span class="kw">const</span> <span class="fn">factorial</span> <span class="op">=</span> <span class="kw">function</span> <span class="fn">fact</span>(n) {
+  <span class="kw">return</span> n <span class="op">&lt;=</span> <span class="num">1</span> <span class="op">?</span> <span class="num">1</span> <span class="op">:</span> n <span class="op">*</span> <span class="fn">fact</span>(n <span class="op">-</span> <span class="num">1</span>);  <span class="cmt">// can call itself by name "fact"</span>
+};
+console.<span class="fn">log</span>(<span class="fn">factorial</span>(<span class="num">5</span>));  <span class="cmt">// 120</span></pre>
+  </div>
+  <table class="compare-table">
+    <tr><th>Feature</th><th>Declaration</th><th>Expression</th></tr>
+    <tr><td>Syntax</td><td><code>function name() {}</code></td><td><code>const name = function() {}</code></td></tr>
+    <tr><td>Hoisted?</td><td><span class="tag-yes">Yes</span> — callable anywhere in scope</td><td><span class="tag-no">No</span> — only usable after assignment</td></tr>
+    <tr><td>Has a name?</td><td><span class="tag-yes">Always named</span></td><td>Can be anonymous or named</td></tr>
+    <tr><td>Best for</td><td>Top-level utility functions</td><td>Callbacks, conditionally assigned functions</td></tr>
+  </table>
+</div>
+
+<!-- Arrow vs Regular -->
+<div class="concept fn fade-in">
+  <div class="concept-label">Arrow vs Regular Function</div>
+  <h3>More than just shorter syntax</h3>
+  <p>Arrow functions are a compact shorthand — but there is a <strong style="color:#c5c8e2">crucial semantic difference</strong>: they do not have their own <code style="color:#a99df5">this</code>. They inherit <code style="color:#a99df5">this</code> from the surrounding (lexical) scope, which makes them ideal for callbacks but wrong for object methods.</p>
+  <div class="code-wrap">
+    <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-filename">arrow-syntax.js</span></div>
+    <pre class="code"><span class="cmt">// Single param — no parens needed</span>
+<span class="kw">const</span> <span class="fn">double</span>  <span class="op">=</span> n <span class="op">=></span> n <span class="op">*</span> <span class="num">2</span>;
+
+<span class="cmt">// Multiple params — parens required</span>
+<span class="kw">const</span> <span class="fn">add</span>     <span class="op">=</span> (a, b) <span class="op">=></span> a <span class="op">+</span> b;
+
+<span class="cmt">// No params — empty parens</span>
+<span class="kw">const</span> <span class="fn">greet</span>   <span class="op">=</span> () <span class="op">=></span> <span class="str">"Hello!"</span>;
+
+<span class="cmt">// Multi-line — needs { } and explicit return</span>
+<span class="kw">const</span> <span class="fn">clamp</span>   <span class="op">=</span> (n, min, max) <span class="op">=></span> {
+  <span class="kw">if</span> (n <span class="op">&lt;</span> min) <span class="kw">return</span> min;
+  <span class="kw">if</span> (n <span class="op">&gt;</span> max) <span class="kw">return</span> max;
+  <span class="kw">return</span> n;
+};
+
+<span class="cmt">// Returning an object literal — wrap in ( )</span>
+<span class="kw">const</span> <span class="fn">makePoint</span> <span class="op">=</span> (x, y) <span class="op">=></span> ({ x, y });</pre>
+  </div>
+  <div class="code-wrap">
+    <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-filename">this-in-callbacks.js</span></div>
+    <pre class="code"><span class="kw">const</span> timer <span class="op">=</span> {
+  <span class="prop">count</span>: <span class="num">0</span>,
+
+  <span class="cmt">// ❌ Regular function loses "this" inside setTimeout</span>
+  <span class="fn">startWrong</span>() {
+    setTimeout(<span class="kw">function</span>() {
+      <span class="kw">this</span>.<span class="prop">count</span><span class="op">++</span>;  <span class="cmt">// ❌ "this" is undefined here</span>
+    }, <span class="num">100</span>);
+  },
+
+  <span class="cmt">// ✅ Arrow function inherits "this" from startCorrect</span>
+  <span class="fn">startCorrect</span>() {
+    setTimeout(() <span class="op">=></span> {
+      <span class="kw">this</span>.<span class="prop">count</span><span class="op">++</span>;  <span class="cmt">// ✅ "this" = timer object</span>
+      console.<span class="fn">log</span>(<span class="kw">this</span>.<span class="prop">count</span>);  <span class="cmt">// 1</span>
+    }, <span class="num">100</span>);
+  }
+};
+timer.<span class="fn">startCorrect</span>();</pre>
+  </div>
+  <table class="compare-table">
+    <tr><th>Feature</th><th>Regular function</th><th>Arrow function</th></tr>
+    <tr><td>Own <code>this</code></td><td><span class="tag-yes">Yes</span> — depends on call site</td><td><span class="tag-no">No</span> — inherits from outer scope</td></tr>
+    <tr><td>Can be constructor?</td><td><span class="tag-yes">Yes</span> — <code>new Fn()</code> works</td><td><span class="tag-no">No</span> — throws TypeError</td></tr>
+    <tr><td><code>arguments</code> object</td><td><span class="tag-yes">Yes</span></td><td><span class="tag-no">No</span> — use rest params <code>...args</code></td></tr>
+    <tr><td>Best for</td><td>Object methods, constructors</td><td>Callbacks, array methods, closures</td></tr>
+  </table>
+</div>
+
+<!-- Closures -->
+<div class="concept fn fade-in">
+  <div class="concept-label">Closures</div>
+  <h3>Functions that remember their birthplace</h3>
+  <p>A <strong style="color:#c5c8e2">closure</strong> is created when an inner function retains access to the variables of its outer (enclosing) function — even after the outer function has finished executing.</p>
+  <p>Think of it like a backpack: when the inner function is born, it packs all the variables it can see and carries them forever.</p>
+  <div class="code-wrap">
+    <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-filename">closure-counter.js</span></div>
+    <pre class="code"><span class="kw">function</span> <span class="fn">makeCounter</span>() {
+  <span class="kw">let</span> count <span class="op">=</span> <span class="num">0</span>;  <span class="cmt">// ← lives in the closure, private!</span>
+
+  <span class="kw">return</span> <span class="kw">function</span>() {
+    count<span class="op">++</span>;
+    <span class="kw">return</span> count;
+  };
+}
+
+<span class="kw">const</span> counter <span class="op">=</span> <span class="fn">makeCounter</span>();  <span class="cmt">// makeCounter() is DONE — but count lives on</span>
+
+console.<span class="fn">log</span>(<span class="fn">counter</span>());  <span class="cmt">// 1</span>
+console.<span class="fn">log</span>(<span class="fn">counter</span>());  <span class="cmt">// 2</span>
+console.<span class="fn">log</span>(<span class="fn">counter</span>());  <span class="cmt">// 3</span>
+
+<span class="cmt">// Each makeCounter() call creates a SEPARATE closure</span>
+<span class="kw">const</span> counter2 <span class="op">=</span> <span class="fn">makeCounter</span>();
+console.<span class="fn">log</span>(<span class="fn">counter2</span>()); <span class="cmt">// 1  ← its own independent count</span>
+console.<span class="fn">log</span>(<span class="fn">counter</span>());  <span class="cmt">// 4  ← counter continues unaffected</span></pre>
+  </div>
+  <div class="code-wrap">
+    <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-filename">closure-factory.js</span></div>
+    <pre class="code"><span class="cmt">// A factory that produces specialized functions</span>
+<span class="kw">function</span> <span class="fn">makeMultiplier</span>(factor) {
+  <span class="kw">return</span> n <span class="op">=></span> n <span class="op">*</span> factor;  <span class="cmt">// "factor" is closed over</span>
+}
+
+<span class="kw">const</span> double <span class="op">=</span> <span class="fn">makeMultiplier</span>(<span class="num">2</span>);
+<span class="kw">const</span> triple <span class="op">=</span> <span class="fn">makeMultiplier</span>(<span class="num">3</span>);
+
+console.<span class="fn">log</span>(<span class="fn">double</span>(<span class="num">5</span>));   <span class="cmt">// 10</span>
+console.<span class="fn">log</span>(<span class="fn">triple</span>(<span class="num">5</span>));   <span class="cmt">// 15</span>
+console.<span class="fn">log</span>(<span class="fn">double</span>(<span class="num">100</span>)); <span class="cmt">// 200</span>
+
+<span class="cmt">// Greeting factory</span>
+<span class="kw">const</span> <span class="fn">makeGreeter</span> <span class="op">=</span> greeting <span class="op">=></span> name <span class="op">=></span> `${greeting}, ${name}!`;
+
+<span class="kw">const</span> hello <span class="op">=</span> <span class="fn">makeGreeter</span>(<span class="str">"Hello"</span>);
+<span class="kw">const</span> hej   <span class="op">=</span> <span class="fn">makeGreeter</span>(<span class="str">"Hej"</span>);
+
+console.<span class="fn">log</span>(<span class="fn">hello</span>(<span class="str">"Anna"</span>));   <span class="cmt">// "Hello, Anna!"</span>
+console.<span class="fn">log</span>(<span class="fn">hej</span>(<span class="str">"Tomek"</span>));   <span class="cmt">// "Hej, Tomek!"</span></pre>
+  </div>
+</div>
+
+<div class="callout fade-in">
+  <div class="callout-icon">💡</div>
+  <p><strong>Why closures matter:</strong> They are the foundation of module patterns, React hooks, event handlers, memoization, and virtually every advanced JavaScript pattern. Master closures — master JavaScript.</p>
+</div>
+
+<!-- Sandbox 1 — Declaration vs Expression -->
+<div class="sandbox fade-in">
+  <div class="sandbox-header">
+    <div class="sandbox-title"><div class="sandbox-icon-wrap" style="background:rgba(124,106,247,.15)">⚙️</div>Sandbox 1 — Declaration &amp; Expression</div>
+    <span class="sandbox-hint">Ctrl+Enter to run · Tab to indent</span>
+  </div>
+  <div class="sandbox-body">
+    <div class="editor-pane">
+      <textarea class="editor" id="ed1" spellcheck="false">// Declaration — hoisted, callable before definition
+console.log(square(4));   // try moving this ABOVE the function!
+
+function square(n) {
+  return n * n;
+}
+
+// Expression — must be defined before use
+const cube = function(n) {
+  return n * n * n;
+};
+console.log(cube(3));
+
+// 🎯 TASK: Write a named function expression called "power"
+// that takes (base, exp) and returns base ** exp
+// Call it: power(2, 10) should give 1024
+
+const power = function power(base, exp) {
+  return base ** exp;
+};
+console.log("2^10 =", power(2, 10));</textarea>
+      <div class="run-bar"><span class="kbd">Ctrl+Enter to run</span><button class="run-btn" onclick="runSandbox('ed1','out1')">▶ Run</button></div>
+    </div>
+    <div class="output-pane"><div class="output-label">// output</div><div class="output-content empty" id="out1">Waiting for you to run the code…</div></div>
+  </div>
+</div>
+
+<!-- Sandbox 2 — Closure: Score Tracker -->
+<div class="sandbox fade-in">
+  <div class="sandbox-header">
+    <div class="sandbox-title"><div class="sandbox-icon-wrap" style="background:rgba(124,106,247,.15)">🔒</div>Sandbox 2 — Closure Task: Score Tracker</div>
+    <span class="sandbox-hint">Private state using closures</span>
+  </div>
+  <div class="sandbox-body">
+    <div class="editor-pane">
+      <textarea class="editor" id="ed2" spellcheck="false">// 🎯 TASK: Create a score tracker using a closure.
+// makeScoreTracker() returns an object with:
+//   add(pts)    — adds points
+//   subtract(n) — subtracts (minimum 0)
+//   getScore()  — returns current score
+//   reset()     — resets to 0
+// The "score" variable must be PRIVATE inside the closure.
+
+function makeScoreTracker(initial = 0) {
+  let score = initial;  // private — nothing outside can touch this
+
+  return {
+    add(pts)      { score += pts; },
+    subtract(pts) { score = Math.max(0, score - pts); },
+    getScore()    { return score; },
+    reset()       { score = 0; }
+  };
+}
+
+const game = makeScoreTracker();
+game.add(10);
+game.add(25);
+game.subtract(5);
+console.log("Score:", game.getScore());       // 30
+
+game.subtract(100);  // can't go below 0
+console.log("After overdraft:", game.getScore()); // 0
+
+// Two trackers are independent
+const p1 = makeScoreTracker(100);
+const p2 = makeScoreTracker(100);
+p1.add(50);
+p2.subtract(20);
+console.log("P1:", p1.getScore(), "| P2:", p2.getScore()); // 150, 80</textarea>
+      <div class="run-bar"><span class="kbd">Ctrl+Enter to run</span><button class="run-btn" onclick="runSandbox('ed2','out2')">▶ Run</button></div>
+    </div>
+    <div class="output-pane"><div class="output-label">// output</div><div class="output-content empty" id="out2">Waiting for you to run the code…</div></div>
+  </div>
+</div>
+
+<!-- Sandbox 3 — Closure: Function Factory -->
+<div class="sandbox fade-in">
+  <div class="sandbox-header">
+    <div class="sandbox-title"><div class="sandbox-icon-wrap" style="background:rgba(124,106,247,.15)">🏭</div>Sandbox 3 — Closure Task: Function Factory</div>
+    <span class="sandbox-hint">Use closures to generate specialized functions</span>
+  </div>
+  <div class="sandbox-body">
+    <div class="editor-pane">
+      <textarea class="editor" id="ed3" spellcheck="false">// 🎯 TASK: Tax calculator factory.
+// makeTaxCalculator(rate) returns a function
+// that takes a price and returns price + tax.
+
+function makeTaxCalculator(rate) {
+  return (price) => +(price * (1 + rate)).toFixed(2);
+}
+
+const vatPL = makeTaxCalculator(0.23);  // 23% VAT
+const vatDE = makeTaxCalculator(0.19);  // 19% VAT
+const vatUK = makeTaxCalculator(0.20);  // 20% VAT
+
+console.log("100 PLN + VAT:", vatPL(100));  // 123
+console.log("100 EUR + VAT:", vatDE(100));  // 119
+console.log("100 GBP + VAT:", vatUK(100));  // 120
+
+// 🎯 BONUS: Discount factory
+// makeDiscount(pct) returns a function that applies % off
+
+function makeDiscount(pct) {
+  return (price) => +(price * (1 - pct / 100)).toFixed(2);
+}
+
+const sale10 = makeDiscount(10);
+const sale50 = makeDiscount(50);
+console.log("200 with 10% off:", sale10(200));  // 180
+console.log("200 with 50% off:", sale50(200));  // 100
+
+// 🎯 CHALLENGE: Can you compose them?
+// Apply 10% discount, then add 23% VAT
+const finalPrice = vatPL(sale10(200));
+console.log("200 → -10% → +23% VAT:", finalPrice);</textarea>
+      <div class="run-bar"><span class="kbd">Ctrl+Enter to run</span><button class="run-btn" onclick="runSandbox('ed3','out3')">▶ Run</button></div>
+    </div>
+    <div class="output-pane"><div class="output-label">// output</div><div class="output-content empty" id="out3">Waiting for you to run the code…</div></div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ════════════ CHAPTER 2 — OBJECTS ════════════ -->
+<div id="objects" class="section-intro fade-in">
+  <div class="section-icon" style="background:rgba(245,166,35,.12)">📦</div>
+  <div>
+    <div class="section-tag" style="color:var(--obj-color)">Chapter 2</div>
+    <h2>Objects</h2>
+    <p>Objects group related data and behaviour. Beyond basics, you need to understand <code style="color:#f5a623">this</code>, safe copying, and how to iterate over keys and values.</p>
+  </div>
+</div>
+
+<!-- Basics -->
+<div class="concept obj fade-in">
+  <div class="concept-label">Basics</div>
+  <h3>Creating and accessing objects</h3>
+  <div class="code-wrap">
+    <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-filename">object-basics.js</span></div>
+    <pre class="code"><span class="kw">const</span> person <span class="op">=</span> {
+  <span class="prop">name</span><span class="op">:</span> <span class="str">"Alice"</span>,
+  <span class="prop">age</span><span class="op">:</span>  <span class="num">25</span>,
+  <span class="prop">city</span><span class="op">:</span> <span class="str">"Warsaw"</span>
+};
+
+person.<span class="prop">job</span> <span class="op">=</span> <span class="str">"developer"</span>;  <span class="cmt">// add</span>
+person.<span class="prop">age</span> <span class="op">=</span> <span class="num">26</span>;             <span class="cmt">// update</span>
+<span class="kw">delete</span> person.<span class="prop">city</span>;         <span class="cmt">// remove</span>
+
+<span class="cmt">// Bracket notation — useful when key is in a variable</span>
+<span class="kw">const</span> key <span class="op">=</span> <span class="str">"name"</span>;
+console.<span class="fn">log</span>(person[key]);   <span class="cmt">// "Alice"</span></pre>
+  </div>
+</div>
+
+<!-- this keyword -->
+<div class="concept obj fade-in">
+  <div class="concept-label">The this keyword</div>
+  <h3>this — referring to the current object</h3>
+  <p>Inside a method, <code style="color:#f5a623">this</code> refers to the object the method belongs to. Its value is determined by <em>how</em> the function is called — not where it is defined.</p>
+  <div class="code-wrap">
+    <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-filename">this-keyword.js</span></div>
+    <pre class="code"><span class="kw">const</span> dog <span class="op">=</span> {
+  <span class="prop">name</span><span class="op">:</span>  <span class="str">"Burek"</span>,
+  <span class="prop">breed</span><span class="op">:</span> <span class="str">"Husky"</span>,
+  <span class="prop">age</span><span class="op">:</span>   <span class="num">3</span>,
+
+  <span class="fn">describe</span>() {
+    <span class="kw">return</span> `${<span class="kw">this</span>.<span class="prop">name</span>} is a ${<span class="kw">this</span>.<span class="prop">breed</span>}`;
+  },
+
+  <span class="fn">birthday</span>() {
+    <span class="kw">this</span>.<span class="prop">age</span><span class="op">++</span>;
+    <span class="kw">return</span> `Happy birthday ${<span class="kw">this</span>.<span class="prop">name</span>}! Now ${<span class="kw">this</span>.<span class="prop">age</span>}.`;
+  }
+};
+
+console.<span class="fn">log</span>(dog.<span class="fn">describe</span>());   <span class="cmt">// "Burek is a Husky"</span>
+console.<span class="fn">log</span>(dog.<span class="fn">birthday</span>());   <span class="cmt">// "Happy birthday Burek! Now 4."</span>
+
+<span class="cmt">// ⚠ The "this" trap — loses context when detached</span>
+<span class="kw">const</span> fn <span class="op">=</span> dog.<span class="prop">describe</span>;        <span class="cmt">// detached — no object prefix</span>
+<span class="cmt">// fn() → TypeError in strict mode: this is undefined</span>
+
+<span class="cmt">// Fix 1: .bind() creates a new permanently bound function</span>
+<span class="kw">const</span> bound <span class="op">=</span> dog.<span class="prop">describe</span>.<span class="fn">bind</span>(dog);
+console.<span class="fn">log</span>(<span class="fn">bound</span>());           <span class="cmt">// ✅ "Burek is a Husky"</span>
+
+<span class="cmt">// Fix 2: .call() / .apply() — invoke with explicit this</span>
+console.<span class="fn">log</span>(dog.<span class="prop">describe</span>.<span class="fn">call</span>(dog)); <span class="cmt">// ✅ same result</span></pre>
+  </div>
+  <div class="callout warn">
+    <div class="callout-icon">⚠️</div>
+    <p><strong>Arrow functions and this:</strong> Never use an arrow function as an object method if you need <code>this</code>. Arrow functions don't have their own <code>this</code> — they inherit it from the outer (module) scope, not from the object.</p>
+  </div>
+</div>
+
+<!-- Object.keys / values / entries -->
+<div class="concept obj fade-in">
+  <div class="concept-label">Iterating objects</div>
+  <h3>Object.keys(), Object.values(), Object.entries()</h3>
+  <p>Objects aren't iterable by default. These three static methods turn an object's contents into arrays so you can use <code style="color:#82aaff">map</code>, <code style="color:#82aaff">filter</code>, and <code style="color:#82aaff">forEach</code> on them.</p>
+  <div class="code-wrap">
+    <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-filename">object-iteration.js</span></div>
+    <pre class="code"><span class="kw">const</span> scores <span class="op">=</span> { <span class="prop">Anna</span><span class="op">:</span> <span class="num">88</span>, <span class="prop">Tomek</span><span class="op">:</span> <span class="num">72</span>, <span class="prop">Kasia</span><span class="op">:</span> <span class="num">95</span>, <span class="prop">Marek</span><span class="op">:</span> <span class="num">61</span> };
+
+<span class="cmt">// Keys only</span>
+console.<span class="fn">log</span>(Object.<span class="fn">keys</span>(scores));
+<span class="cmt">// ["Anna", "Tomek", "Kasia", "Marek"]</span>
+
+<span class="cmt">// Values only</span>
+console.<span class="fn">log</span>(Object.<span class="fn">values</span>(scores));
+<span class="cmt">// [88, 72, 95, 61]</span>
+
+<span class="cmt">// Key-value pairs — great for iteration</span>
+Object.<span class="fn">entries</span>(scores).<span class="fn">forEach</span>(([name, score]) <span class="op">=></span> {
+  console.<span class="fn">log</span>(`${name}: ${score}`);
+});
+
+<span class="cmt">// Average score using Object.values()</span>
+<span class="kw">const</span> vals <span class="op">=</span> Object.<span class="fn">values</span>(scores);
+<span class="kw">const</span> avg  <span class="op">=</span> vals.<span class="fn">reduce</span>((s, v) <span class="op">=></span> s <span class="op">+</span> v, <span class="num">0</span>) <span class="op">/</span> vals.<span class="prop">length</span>;
+console.<span class="fn">log</span>(<span class="str">"Average:"</span>, avg.<span class="fn">toFixed</span>(<span class="num">1</span>));  <span class="cmt">// 79.0</span>
+
+<span class="cmt">// Rebuild object with transformed values (Object.fromEntries)</span>
+<span class="kw">const</span> boosted <span class="op">=</span> Object.<span class="fn">fromEntries</span>(
+  Object.<span class="fn">entries</span>(scores).<span class="fn">map</span>(([k, v]) <span class="op">=></span> [k, v <span class="op">+</span> <span class="num">5</span>])
+);
+console.<span class="fn">log</span>(boosted); <span class="cmt">// { Anna: 93, Tomek: 77, Kasia: 100, Marek: 66 }</span></pre>
+  </div>
+</div>
+
+<!-- Object Copy -->
+<div class="concept obj fade-in">
+  <div class="concept-label">Copying objects</div>
+  <h3>Shallow copy vs Deep copy — a critical difference</h3>
+  <p>Objects are stored by <strong style="color:#c5c8e2">reference</strong>. Assigning <code style="color:#a99df5">const b = a</code> does not copy — both names point to the same data. Modifying one modifies the other.</p>
+  <div class="code-wrap">
+    <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-filename">object-copy.js</span></div>
+    <pre class="code"><span class="cmt">// ❌ NOT a copy — same reference</span>
+<span class="kw">const</span> original <span class="op">=</span> { <span class="prop">name</span><span class="op">:</span> <span class="str">"Alice"</span>, <span class="prop">age</span><span class="op">:</span> <span class="num">25</span> };
+<span class="kw">const</span> oops <span class="op">=</span> original;
+oops.<span class="prop">age</span> <span class="op">=</span> <span class="num">99</span>;
+console.<span class="fn">log</span>(original.<span class="prop">age</span>);   <span class="cmt">// 99 — original was mutated!</span>
+
+<span class="cmt">// ✅ SHALLOW COPY — spread operator</span>
+<span class="kw">const</span> copy1 <span class="op">=</span> { ...original };
+copy1.<span class="prop">age</span> <span class="op">=</span> <span class="num">30</span>;
+console.<span class="fn">log</span>(original.<span class="prop">age</span>);   <span class="cmt">// 99 — original safe ✅</span>
+
+<span class="cmt">// ✅ SHALLOW COPY — Object.assign</span>
+<span class="kw">const</span> copy2 <span class="op">=</span> Object.<span class="fn">assign</span>({}, original);
+
+<span class="cmt">// ⚠ Shallow only goes ONE level deep!</span>
+<span class="kw">const</span> user <span class="op">=</span> { <span class="prop">name</span><span class="op">:</span> <span class="str">"Bob"</span>, <span class="prop">address</span><span class="op">:</span> { <span class="prop">city</span><span class="op">:</span> <span class="str">"Warsaw"</span> } };
+<span class="kw">const</span> shallow <span class="op">=</span> { ...user };
+shallow.<span class="prop">address</span>.<span class="prop">city</span> <span class="op">=</span> <span class="str">"Kraków"</span>;
+console.<span class="fn">log</span>(user.<span class="prop">address</span>.<span class="prop">city</span>); <span class="cmt">// "Kraków" ← still shared!</span>
+
+<span class="cmt">// ✅ DEEP COPY — JSON round-trip (for plain data)</span>
+<span class="kw">const</span> deep <span class="op">=</span> JSON.<span class="fn">parse</span>(JSON.<span class="fn">stringify</span>(user));
+deep.<span class="prop">address</span>.<span class="prop">city</span> <span class="op">=</span> <span class="str">"Gdańsk"</span>;
+console.<span class="fn">log</span>(user.<span class="prop">address</span>.<span class="prop">city</span>);  <span class="cmt">// "Kraków" — safe ✅</span>
+
+<span class="cmt">// ✅ DEEP COPY — structuredClone (modern, handles more types)</span>
+<span class="kw">const</span> deep2 <span class="op">=</span> structuredClone(user);</pre>
+  </div>
+  <table class="compare-table">
+    <tr><th>Method</th><th>Nested objects?</th><th>Use when</th></tr>
+    <tr><td><code>const b = a</code></td><td><span class="tag-no">Not a copy at all</span></td><td>Never for copying</td></tr>
+    <tr><td><code>{...a}</code> spread</td><td><span class="tag-no">Shallow — nested shared</span></td><td>Flat objects only</td></tr>
+    <tr><td><code>Object.assign({}, a)</code></td><td><span class="tag-no">Shallow — nested shared</span></td><td>Flat objects, older code</td></tr>
+    <tr><td><code>JSON.parse(JSON.stringify(a))</code></td><td><span class="tag-yes">Deep — fully independent</span></td><td>Nested plain data, no functions/dates</td></tr>
+    <tr><td><code>structuredClone(a)</code></td><td><span class="tag-yes">Deep — handles more types</span></td><td>Modern environments, best practice</td></tr>
+  </table>
+</div>
+
+<!-- Sandbox 4 — this + methods -->
+<div class="sandbox fade-in">
+  <div class="sandbox-header">
+    <div class="sandbox-title"><div class="sandbox-icon-wrap" style="background:rgba(245,166,35,.15)">🏦</div>Sandbox 4 — this: Bank Account</div>
+    <span class="sandbox-hint">Use this inside object methods</span>
+  </div>
+  <div class="sandbox-body">
+    <div class="editor-pane">
+      <textarea class="editor" id="ed4" spellcheck="false">// 🎯 TASK: Build a bankAccount object that uses "this" properly.
+// Methods: deposit(n), withdraw(n), getStatement()
+
+const bankAccount = {
+  owner: "Kasia Kowalska",
+  balance: 1000,
+
+  deposit(amount) {
+    this.balance += amount;
+    return `Deposited ${amount}. New balance: ${this.balance} PLN`;
+  },
+
+  withdraw(amount) {
+    if (amount > this.balance) return "Insufficient funds!";
+    this.balance -= amount;
+    return `Withdrew ${amount}. New balance: ${this.balance} PLN`;
+  },
+
+  getStatement() {
+    return `Owner: ${this.owner} | Balance: ${this.balance} PLN`;
+  }
+};
+
+console.log(bankAccount.getStatement());
+console.log(bankAccount.deposit(500));
+console.log(bankAccount.withdraw(200));
+console.log(bankAccount.withdraw(5000));
+console.log(bankAccount.getStatement());
+
+// 🎯 BONUS: Why does this break?
+// const fn = bankAccount.withdraw;
+// fn(100);  // ← what error do you get? why?</textarea>
+      <div class="run-bar"><span class="kbd">Ctrl+Enter to run</span><button class="run-btn" onclick="runSandbox('ed4','out4')">▶ Run</button></div>
+    </div>
+    <div class="output-pane"><div class="output-label">// output</div><div class="output-content empty" id="out4">Waiting for you to run the code…</div></div>
+  </div>
+</div>
+
+<!-- Sandbox 5 — keys/values/entries + copy -->
+<div class="sandbox fade-in">
+  <div class="sandbox-header">
+    <div class="sandbox-title"><div class="sandbox-icon-wrap" style="background:rgba(245,166,35,.15)">🗂️</div>Sandbox 5 — Keys / Values / Entries &amp; Copy</div>
+    <span class="sandbox-hint">Iterate objects and copy them safely</span>
+  </div>
+  <div class="sandbox-body">
+    <div class="editor-pane">
+      <textarea class="editor" id="ed5" spellcheck="false">const inventory = {
+  apples: 40, bananas: 15, oranges: 8,
+  grapes: 60, mangoes: 3
+};
+
+// 1. List all item names
+console.log("Items:", Object.keys(inventory));
+
+// 2. Total stock
+const total = Object.values(inventory).reduce((s, v) => s + v, 0);
+console.log("Total stock:", total);
+
+// 3. Low stock alert (items < 10)
+const lowStock = Object.entries(inventory)
+  .filter(([, qty]) => qty < 10)
+  .map(([item]) => item);
+console.log("Low stock:", lowStock);
+
+// 4. Restock — increase all by 20% (safe copy, no mutation)
+const restocked = Object.fromEntries(
+  Object.entries(inventory).map(([item, qty]) => [item, Math.round(qty * 1.2)])
+);
+console.log("Restocked:", restocked);
+console.log("Original apples unchanged:", inventory.apples);
+
+// 5. Deep copy test
+const snapshot = JSON.parse(JSON.stringify(inventory));
+snapshot.apples = 999;
+console.log("Snapshot:", snapshot.apples, "| Original:", inventory.apples);</textarea>
+      <div class="run-bar"><span class="kbd">Ctrl+Enter to run</span><button class="run-btn" onclick="runSandbox('ed5','out5')">▶ Run</button></div>
+    </div>
+    <div class="output-pane"><div class="output-label">// output</div><div class="output-content empty" id="out5">Waiting for you to run the code…</div></div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ════════════ CHAPTER 3 — ARRAYS ════════════ -->
+<div id="arrays" class="section-intro fade-in">
+  <div class="section-icon" style="background:rgba(62,207,142,.1)">📋</div>
+  <div>
+    <div class="section-tag" style="color:var(--arr-color)">Chapter 3</div>
+    <h2>Arrays</h2>
+    <p>An ordered list. Each item sits at a numbered index starting from zero. Arrays come with powerful built-in methods — <code style="color:#3ecf8e">map</code>, <code style="color:#3ecf8e">filter</code>, <code style="color:#3ecf8e">reduce</code> and more — that accept functions as arguments.</p>
+  </div>
+</div>
+
+<div class="concept arr fade-in">
+  <div class="concept-label">Basics &amp; Methods</div>
+  <h3>Accessing and transforming arrays</h3>
+  <div class="method-grid">
+    <div class="method-card"><div class="method-name">push(item)</div><div class="method-desc">Add to end</div></div>
+    <div class="method-card"><div class="method-name">pop()</div><div class="method-desc">Remove last item</div></div>
+    <div class="method-card"><div class="method-name">unshift(item)</div><div class="method-desc">Add to beginning</div></div>
+    <div class="method-card"><div class="method-name">shift()</div><div class="method-desc">Remove first item</div></div>
+    <div class="method-card"><div class="method-name">map(fn)</div><div class="method-desc">Transform every item → new array</div></div>
+    <div class="method-card"><div class="method-name">filter(fn)</div><div class="method-desc">Keep items passing a test</div></div>
+    <div class="method-card"><div class="method-name">reduce(fn)</div><div class="method-desc">Collapse to single value</div></div>
+    <div class="method-card"><div class="method-name">find(fn)</div><div class="method-desc">First matching item</div></div>
+    <div class="method-card"><div class="method-name">includes(v)</div><div class="method-desc">Check if value exists</div></div>
+    <div class="method-card"><div class="method-name">forEach(fn)</div><div class="method-desc">Loop — no return value</div></div>
+  </div>
+  <div class="code-wrap">
+    <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-filename">arrays.js</span></div>
+    <pre class="code"><span class="kw">const</span> nums <span class="op">=</span> [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>, <span class="num">5</span>];
+
+<span class="kw">const</span> doubled <span class="op">=</span> nums.<span class="fn">map</span>(n <span class="op">=></span> n <span class="op">*</span> <span class="num">2</span>);           <span class="cmt">// [2,4,6,8,10]</span>
+<span class="kw">const</span> evens   <span class="op">=</span> nums.<span class="fn">filter</span>(n <span class="op">=></span> n <span class="op">%</span> <span class="num">2</span> <span class="op">===</span> <span class="num">0</span>);  <span class="cmt">// [2,4]</span>
+<span class="kw">const</span> total   <span class="op">=</span> nums.<span class="fn">reduce</span>((s, n) <span class="op">=></span> s <span class="op">+</span> n, <span class="num">0</span>); <span class="cmt">// 15</span></pre>
+  </div>
+</div>
+
+<!-- Sandbox 6 — Arrays -->
+<div class="sandbox fade-in">
+  <div class="sandbox-header">
+    <div class="sandbox-title"><div class="sandbox-icon-wrap" style="background:rgba(62,207,142,.12)">⚙️</div>Sandbox 6 — Arrays</div>
+    <span class="sandbox-hint">map · filter · reduce · find</span>
+  </div>
+  <div class="sandbox-body">
+    <div class="editor-pane">
+      <textarea class="editor" id="ed6" spellcheck="false">const scores = [45, 82, 91, 67, 55, 78, 95, 38, 74, 88];
+
+// 1. Passing scores (>= 60)
+const passing = scores.filter(s => s >= 60);
+console.log("Passing:", passing);
+
+// 2. Average
+const avg = scores.reduce((sum, s) => sum + s, 0) / scores.length;
+console.log("Average:", avg.toFixed(1));
+
+// 3. First score above 90
+const topScore = scores.find(s => s > 90);
+console.log("First >90:", topScore);
+
+// 4. Sorted high to low (spread to avoid mutating original)
+const sorted = [...scores].sort((a, b) => b - a);
+console.log("Sorted:", sorted);</textarea>
+      <div class="run-bar"><span class="kbd">Ctrl+Enter to run</span><button class="run-btn" onclick="runSandbox('ed6','out6')">▶ Run</button></div>
+    </div>
+    <div class="output-pane"><div class="output-label">// output</div><div class="output-content empty" id="out6">Waiting for you to run the code…</div></div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ════════════ CHAPTER 4 — ALL TOGETHER ════════════ -->
+<div id="combined" class="section-intro fade-in">
+  <div class="section-icon" style="background:rgba(92,187,255,.1)">🔗</div>
+  <div>
+    <div class="section-tag" style="color:#5cbbff">Chapter 4</div>
+    <h2>All Together</h2>
+    <p>Real code combines closures, <code style="color:#f5a623">this</code>, objects, and arrays in every file. Here is a task manager that uses all three at once.</p>
+  </div>
+</div>
+
+<!-- Sandbox 7 — Combined challenge -->
+<div class="sandbox fade-in">
+  <div class="sandbox-header">
+    <div class="sandbox-title"><div class="sandbox-icon-wrap" style="background:rgba(92,187,255,.15)">🔥</div>Sandbox 7 — Challenge: Task Manager</div>
+    <span class="sandbox-hint">Closures + objects + arrays combined</span>
+  </div>
+  <div class="sandbox-body">
+    <div class="editor-pane">
+      <textarea class="editor" id="ed7" spellcheck="false">// A task manager using closures (private state) + objects + arrays
+
+function createTaskManager() {
+  let tasks  = [];   // private
+  let nextId = 1;    // private
+
+  return {
+    add(title, priority = "normal") {
+      tasks.push({ id: nextId++, title, priority, done: false });
+    },
+    complete(id) {
+      const t = tasks.find(t => t.id === id);
+      if (t) t.done = true;
+    },
+    getPending() {
+      return tasks.filter(t => !t.done);
+    },
+    getSummary() {
+      const done    = tasks.filter(t => t.done).length;
+      const pending = tasks.filter(t => !t.done).length;
+      return { total: tasks.length, done, pending };
+    },
+    getByPriority(level) {
+      return tasks.filter(t => t.priority === level);
+    }
+  };
+}
+
+const tm = createTaskManager();
+tm.add("Learn closures",    "high");
+tm.add("Build a project",   "high");
+tm.add("Practice arrays",   "normal");
+tm.add("Read the docs",     "low");
+tm.add("Write unit tests",  "normal");
+
+tm.complete(1);
+tm.complete(3);
+
+console.log("Pending:");
+tm.getPending().forEach(t => console.log(" -", t.title, "["+t.priority+"]"));
+
+console.log("High priority:");
+tm.getByPriority("high").forEach(t =>
+  console.log(" -", t.title, t.done ? "✓" : "○")
+);
+
+console.log("Summary:", JSON.stringify(tm.getSummary()));</textarea>
+      <div class="run-bar"><span class="kbd">Ctrl+Enter to run</span><button class="run-btn" onclick="runSandbox('ed7','out7')">▶ Run</button></div>
+    </div>
+    <div class="output-pane"><div class="output-label">// output</div><div class="output-content empty" id="out7">Waiting for you to run the code…</div></div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ════════════ CHAPTER 5 — QUIZ ════════════ -->
+<div id="quiz" class="quiz-section fade-in">
+  <div class="section-intro" style="padding-top:0">
+    <div class="section-icon" style="background:rgba(255,126,179,.1)">🎯</div>
+    <div>
+      <div class="section-tag" style="color:#ff7eb3">Chapter 5</div>
+      <h2>Quiz</h2>
+      <p>10 questions covering functions, closures, <code style="color:#f5a623">this</code>, object copying, iteration, and arrays.</p>
+    </div>
+  </div>
+
+  <!-- Q1 -->
+  <div class="quiz-card fade-in">
+    <div class="quiz-num">Question 01 / 10</div>
+    <div class="quiz-q">What is the key difference between a function declaration and a function expression?</div>
+    <div class="quiz-opts">
+      <button class="quiz-opt" onclick="answer(this,false,'q1')"><span class="opt-letter">A</span>Declarations are faster at runtime than expressions</button>
+      <button class="quiz-opt" onclick="answer(this,true,'q1')"><span class="opt-letter">B</span>Declarations are hoisted and callable before they appear; expressions are not</button>
+      <button class="quiz-opt" onclick="answer(this,false,'q1')"><span class="opt-letter">C</span>Expressions can accept parameters; declarations cannot</button>
+      <button class="quiz-opt" onclick="answer(this,false,'q1')"><span class="opt-letter">D</span>There is no practical difference between them</button>
+    </div>
+    <div class="quiz-feedback ok" id="q1-ok">✓ Correct! Function declarations are hoisted to the top of their scope, so they can be called before their definition appears in the file. Expressions are not hoisted.</div>
+    <div class="quiz-feedback no" id="q1-no">✗ The key difference is <strong>hoisting</strong>. Declarations are moved to the top of scope automatically; expressions must appear before any call to them.</div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="quiz-card fade-in">
+    <div class="quiz-num">Question 02 / 10</div>
+    <div class="quiz-q">What will this closure-based code log?</div>
+    <div class="quiz-code"><span class="kw">function</span> <span class="fn">makeAdder</span>(x) {
+  <span class="kw">return</span> n <span class="op">=></span> n <span class="op">+</span> x;
+}
+<span class="kw">const</span> add5 <span class="op">=</span> <span class="fn">makeAdder</span>(<span class="num">5</span>);
+console.<span class="fn">log</span>(<span class="fn">add5</span>(<span class="num">3</span>));</div>
+    <div class="quiz-opts">
+      <button class="quiz-opt" onclick="answer(this,false,'q2')"><span class="opt-letter">A</span>5</button>
+      <button class="quiz-opt" onclick="answer(this,false,'q2')"><span class="opt-letter">B</span>3</button>
+      <button class="quiz-opt" onclick="answer(this,true,'q2')"><span class="opt-letter">C</span>8</button>
+      <button class="quiz-opt" onclick="answer(this,false,'q2')"><span class="opt-letter">D</span>Error — x is not defined</button>
+    </div>
+    <div class="quiz-feedback ok" id="q2-ok">✓ Correct! <code>add5</code> closes over <code>x = 5</code>. When called with <code>3</code>, it returns <code>3 + 5 = 8</code>. The closure keeps <code>x</code> alive.</div>
+    <div class="quiz-feedback no" id="q2-no">✗ This is a closure. <code>makeAdder(5)</code> returns a function that remembers <code>x = 5</code>. Calling <code>add5(3)</code> gives <code>3 + 5 = 8</code>.</div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="quiz-card fade-in">
+    <div class="quiz-num">Question 03 / 10</div>
+    <div class="quiz-q">Two counters made from the same factory — what does c2() log?</div>
+    <div class="quiz-code"><span class="kw">const</span> c1 <span class="op">=</span> <span class="fn">makeCounter</span>();
+<span class="kw">const</span> c2 <span class="op">=</span> <span class="fn">makeCounter</span>();
+<span class="fn">c1</span>(); <span class="fn">c1</span>();    <span class="cmt">// c1 is now at 2</span>
+console.<span class="fn">log</span>(<span class="fn">c2</span>());</div>
+    <div class="quiz-opts">
+      <button class="quiz-opt" onclick="answer(this,false,'q3')"><span class="opt-letter">A</span>3 — they share the same count</button>
+      <button class="quiz-opt" onclick="answer(this,true,'q3')"><span class="opt-letter">B</span>1 — each closure has its own independent count</button>
+      <button class="quiz-opt" onclick="answer(this,false,'q3')"><span class="opt-letter">C</span>2 — c2 inherits c1's state</button>
+      <button class="quiz-opt" onclick="answer(this,false,'q3')"><span class="opt-letter">D</span>undefined</button>
+    </div>
+    <div class="quiz-feedback ok" id="q3-ok">✓ Correct! Each call to <code>makeCounter()</code> creates a brand new, independent closure with its own <code>count</code>. They never share state.</div>
+    <div class="quiz-feedback no" id="q3-no">✗ Each <code>makeCounter()</code> call creates a separate closure with its own <code>count</code> starting from 0. <code>c2()</code> gives <code>1</code>.</div>
+  </div>
+
+  <!-- Q4 -->
+  <div class="quiz-card fade-in">
+    <div class="quiz-num">Question 04 / 10</div>
+    <div class="quiz-q">What does <code>this</code> refer to inside a regular object method when called normally?</div>
+    <div class="quiz-opts">
+      <button class="quiz-opt" onclick="answer(this,false,'q4')"><span class="opt-letter">A</span>The global window object</button>
+      <button class="quiz-opt" onclick="answer(this,true,'q4')"><span class="opt-letter">B</span>The object the method was called on</button>
+      <button class="quiz-opt" onclick="answer(this,false,'q4')"><span class="opt-letter">C</span>The function itself</button>
+      <button class="quiz-opt" onclick="answer(this,false,'q4')"><span class="opt-letter">D</span>undefined in all cases</button>
+    </div>
+    <div class="quiz-feedback ok" id="q4-ok">✓ Correct! When you call <code>dog.bark()</code>, inside <code>bark</code>, <code>this</code> is the <code>dog</code> object — the thing before the dot.</div>
+    <div class="quiz-feedback no" id="q4-no">✗ Inside a method called on an object (e.g. <code>obj.method()</code>), <code>this</code> is that object — the thing before the dot.</div>
+  </div>
+
+  <!-- Q5 -->
+  <div class="quiz-card fade-in">
+    <div class="quiz-num">Question 05 / 10</div>
+    <div class="quiz-q">Why is using an arrow function as an object method problematic?</div>
+    <div class="quiz-opts">
+      <button class="quiz-opt" onclick="answer(this,false,'q5')"><span class="opt-letter">A</span>Arrow functions cannot return values from objects</button>
+      <button class="quiz-opt" onclick="answer(this,true,'q5')"><span class="opt-letter">B</span>Arrow functions don't have their own this — it won't refer to the object</button>
+      <button class="quiz-opt" onclick="answer(this,false,'q5')"><span class="opt-letter">C</span>Arrow functions run slower inside objects</button>
+      <button class="quiz-opt" onclick="answer(this,false,'q5')"><span class="opt-letter">D</span>Nothing is wrong — they work exactly like regular methods</button>
+    </div>
+    <div class="quiz-feedback ok" id="q5-ok">✓ Correct! Arrow functions inherit <code>this</code> from the enclosing scope (usually the module level), not from the object — so <code>this.property</code> would be undefined.</div>
+    <div class="quiz-feedback no" id="q5-no">✗ Arrow functions don't have their own <code>this</code>. As an object method, <code>this</code> would refer to the outer scope (module/window), not the object.</div>
+  </div>
+
+  <!-- Q6 -->
+  <div class="quiz-card fade-in">
+    <div class="quiz-num">Question 06 / 10</div>
+    <div class="quiz-q">What will <code>original.age</code> be after this code?</div>
+    <div class="quiz-code"><span class="kw">const</span> original <span class="op">=</span> { <span class="prop">name</span><span class="op">:</span> <span class="str">"Alice"</span>, <span class="prop">age</span><span class="op">:</span> <span class="num">25</span> };
+<span class="kw">const</span> copy <span class="op">=</span> original;
+copy.<span class="prop">age</span> <span class="op">=</span> <span class="num">99</span>;</div>
+    <div class="quiz-opts">
+      <button class="quiz-opt" onclick="answer(this,false,'q6')"><span class="opt-letter">A</span>25 — the original is protected</button>
+      <button class="quiz-opt" onclick="answer(this,true,'q6')"><span class="opt-letter">B</span>99 — assignment copies the reference, not the object</button>
+      <button class="quiz-opt" onclick="answer(this,false,'q6')"><span class="opt-letter">C</span>undefined</button>
+      <button class="quiz-opt" onclick="answer(this,false,'q6')"><span class="opt-letter">D</span>Error — const cannot be reassigned</button>
+    </div>
+    <div class="quiz-feedback ok" id="q6-ok">✓ Correct! <code>const copy = original</code> doesn't copy the object — both variables point to the same memory location. Mutating one mutates both.</div>
+    <div class="quiz-feedback no" id="q6-no">✗ <code>=</code> doesn't copy objects — it copies the reference. Both <code>copy</code> and <code>original</code> point to the same object, so <code>age</code> becomes 99 everywhere.</div>
+  </div>
+
+  <!-- Q7 -->
+  <div class="quiz-card fade-in">
+    <div class="quiz-num">Question 07 / 10</div>
+    <div class="quiz-q">Which creates a fully independent deep copy of an object with nested data?</div>
+    <div class="quiz-opts">
+      <button class="quiz-opt" onclick="answer(this,false,'q7')"><span class="opt-letter">A</span>const b = a</button>
+      <button class="quiz-opt" onclick="answer(this,false,'q7')"><span class="opt-letter">B</span>const b = {...a}</button>
+      <button class="quiz-opt" onclick="answer(this,false,'q7')"><span class="opt-letter">C</span>const b = Object.assign({}, a)</button>
+      <button class="quiz-opt" onclick="answer(this,true,'q7')"><span class="opt-letter">D</span>const b = JSON.parse(JSON.stringify(a))</button>
+    </div>
+    <div class="quiz-feedback ok" id="q7-ok">✓ Correct! Spread and <code>Object.assign</code> are shallow — nested objects are still shared. The JSON round-trip produces a completely independent deep copy.</div>
+    <div class="quiz-feedback no" id="q7-no">✗ Only the JSON round-trip (or <code>structuredClone</code>) produces a true deep copy. Spread and <code>Object.assign</code> are shallow — nested objects remain shared.</div>
+  </div>
+
+  <!-- Q8 -->
+  <div class="quiz-card fade-in">
+    <div class="quiz-num">Question 08 / 10</div>
+    <div class="quiz-q">What does <code>Object.entries(obj)</code> return?</div>
+    <div class="quiz-opts">
+      <button class="quiz-opt" onclick="answer(this,false,'q8')"><span class="opt-letter">A</span>An array of all keys</button>
+      <button class="quiz-opt" onclick="answer(this,false,'q8')"><span class="opt-letter">B</span>An array of all values</button>
+      <button class="quiz-opt" onclick="answer(this,true,'q8')"><span class="opt-letter">C</span>An array of [key, value] pairs</button>
+      <button class="quiz-opt" onclick="answer(this,false,'q8')"><span class="opt-letter">D</span>The number of properties in the object</button>
+    </div>
+    <div class="quiz-feedback ok" id="q8-ok">✓ Correct! <code>Object.entries()</code> returns <code>[["key1", val1], ["key2", val2], ...]</code>, which you can destructure as <code>([key, value])</code> in callbacks.</div>
+    <div class="quiz-feedback no" id="q8-no">✗ <code>Object.entries()</code> returns <code>[key, value]</code> pairs. Use <code>Object.keys()</code> for just keys, <code>Object.values()</code> for just values.</div>
+  </div>
+
+  <!-- Q9 -->
+  <div class="quiz-card fade-in">
+    <div class="quiz-num">Question 09 / 10</div>
+    <div class="quiz-q">Which array method should you use to transform every element into a new value and get a new array back?</div>
+    <div class="quiz-opts">
+      <button class="quiz-opt" onclick="answer(this,false,'q9')"><span class="opt-letter">A</span>forEach()</button>
+      <button class="quiz-opt" onclick="answer(this,false,'q9')"><span class="opt-letter">B</span>filter()</button>
+      <button class="quiz-opt" onclick="answer(this,true,'q9')"><span class="opt-letter">C</span>map()</button>
+      <button class="quiz-opt" onclick="answer(this,false,'q9')"><span class="opt-letter">D</span>find()</button>
+    </div>
+    <div class="quiz-feedback ok" id="q9-ok">✓ Correct! <code>map()</code> returns a new array of the same length where each element has been transformed by your callback. The original array is never changed.</div>
+    <div class="quiz-feedback no" id="q9-no">✗ Use <code>map()</code>. <code>forEach</code> loops without returning a value, <code>filter</code> keeps/removes items, and <code>find</code> returns the first match.</div>
+  </div>
+
+  <!-- Q10 -->
+  <div class="quiz-card fade-in">
+    <div class="quiz-num">Question 10 / 10</div>
+    <div class="quiz-q">Which best describes a closure?</div>
+    <div class="quiz-opts">
+      <button class="quiz-opt" onclick="answer(this,false,'q10')"><span class="opt-letter">A</span>A function with no parameters or return value</button>
+      <button class="quiz-opt" onclick="answer(this,false,'q10')"><span class="opt-letter">B</span>A function that calls itself recursively</button>
+      <button class="quiz-opt" onclick="answer(this,true,'q10')"><span class="opt-letter">C</span>An inner function that retains access to its outer scope's variables even after the outer function has returned</button>
+      <button class="quiz-opt" onclick="answer(this,false,'q10')"><span class="opt-letter">D</span>A method defined on an object using arrow syntax</button>
+    </div>
+    <div class="quiz-feedback ok" id="q10-ok">✓ That's the definition! The inner function carries a reference to its outer scope — keeping those variables alive and accessible long after the outer function finished.</div>
+    <div class="quiz-feedback no" id="q10-no">✗ A closure is an inner function that keeps a reference to variables from its outer scope, even after that outer function has finished executing.</div>
+  </div>
+
+  <!-- SCORE -->
+  <div id="score-reveal" style="display:none" class="concept neutral fade-in">
+    <div class="concept-label">Your result</div>
+    <h3 id="score-title"></h3>
+    <p id="score-msg"></p>
+  </div>
+
+</div><!-- /quiz -->
+</div><!-- /page -->
+
+<div class="footer">
+  <strong>JavaScript Foundations</strong> · Functions, Objects &amp; Arrays<br>
+  <span style="font-size:12px;opacity:.5;margin-top:6px;display:block">7 live sandboxes · 10 quiz questions · Edit any sandbox and press Run to experiment</span>
+</div>
+
+<script>
+function runSandbox(edId, outId) {
+  const code = document.getElementById(edId).value;
+  const outEl = document.getElementById(outId);
+  const lines = [];
+  const orig = console.log;
+  console.log = (...args) => {
+    lines.push(args.map(a => {
+      if (Array.isArray(a)) return '[' + a.map(i => typeof i === 'object' && i !== null ? JSON.stringify(i) : String(i)).join(', ') + ']';
+      if (a !== null && typeof a === 'object') return JSON.stringify(a, null, 0);
+      return String(a);
+    }).join(' '));
+  };
+  try {
+    eval(code);
+    if (!lines.length) {
+      outEl.textContent = '(no output — add console.log() to see results)';
+      outEl.className = 'output-content empty';
+    } else {
+      outEl.innerHTML = lines.map((l, i) => '<span class="output-line-num">'+(i+1)+'</span>'+esc(l)).join('\n');
+      outEl.className = 'output-content';
+    }
+  } catch(e) {
+    outEl.textContent = '⚠ Error: ' + e.message;
+    outEl.className = 'output-content err';
+  }
+  console.log = orig;
+}
+function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+document.querySelectorAll('textarea.editor').forEach(ta => {
+  const num = ta.id.replace('ed','');
+  ta.addEventListener('keydown', e => {
+    if ((e.ctrlKey||e.metaKey) && e.key==='Enter') { e.preventDefault(); runSandbox('ed'+num,'out'+num); }
+    if (e.key==='Tab') {
+      e.preventDefault();
+      const s=ta.selectionStart, end=ta.selectionEnd;
+      ta.value=ta.value.substring(0,s)+'  '+ta.value.substring(end);
+      ta.selectionStart=ta.selectionEnd=s+2;
+    }
+  });
+});
+
+const quizState = {}; let answered = 0, correct = 0; const totalQ = 10;
+function answer(btn, isCorrect, qid) {
+  if (quizState[qid]) return;
+  quizState[qid] = true; answered++;
+  if (isCorrect) correct++;
+  btn.closest('.quiz-card').querySelectorAll('.quiz-opt').forEach(b => b.disabled=true);
+  btn.classList.add(isCorrect ? 'correct' : 'wrong');
+  document.getElementById(qid+(isCorrect?'-ok':'-no')).classList.add('show');
+  if (answered === totalQ) {
+    const el = document.getElementById('score-reveal');
+    el.style.display = 'block';
+    const pct = correct/totalQ;
+    const msg = ['Review the lessons above and try again!','Getting there — re-read closures and this.','Good work! You understand the core concepts.','Outstanding! You really know your JavaScript.'];
+    const tier = pct>=.9?3:pct>=.7?2:pct>=.5?1:0;
+    document.getElementById('score-title').textContent = correct+' / '+totalQ+' correct ('+Math.round(pct*100)+'%)';
+    document.getElementById('score-msg').textContent = msg[tier]+' All 7 sandboxes are still live — keep experimenting!';
+    el.scrollIntoView({behavior:'smooth',block:'center'});
+  }
+}
+
+window.addEventListener('scroll', () => {
+  const max = document.documentElement.scrollHeight - window.innerHeight;
+  document.getElementById('progress').style.width = Math.round((window.scrollY/max)*100)+'%';
+  const ids = ['functions','objects','arrays','combined','quiz'];
+  let cur = ids[0];
+  ids.forEach(id => { const el=document.getElementById(id); if(el && window.scrollY>=el.offsetTop-120) cur=id; });
+  document.querySelectorAll('.sticky-nav a').forEach(a => a.classList.toggle('active', a.getAttribute('href')==='#'+cur));
+});
+
+const obs = new IntersectionObserver(entries => entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); }), {threshold:0.06});
+document.querySelectorAll('.fade-in').forEach(el => obs.observe(el));
+</script>
+</body>
+</html>
